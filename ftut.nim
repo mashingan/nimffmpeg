@@ -32,9 +32,9 @@ template `[]=`*[T](p: ptr T, off: int, val: T) =
 proc saveGrayFrame(buf: ptr byte, wrap, xsize, ysize: cint, name: string) =
   var s = newFileStream(name, mode = fmWrite)
   s.write &"P5\n{xsize} {ysize}\n{255}\n"
+  var currbuf = cast[ptr UncheckedArray[byte]](buf)
   for i in 0 ..< ysize:
-    var currbuf = buf[i * wrap]
-    s.writeData(addr currbuf, xsize)
+    s.writeData(addr(currbuf[i*wrap]), xsize)
   close s
 
 proc main =
