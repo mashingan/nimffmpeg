@@ -1,3 +1,6 @@
+# This example is taken from ffmpeg tutorial page
+# https://github.com/leandromoreira/ffmpeg-libav-tutorial
+
 import libavcodec/avcodec
 import libavformat/avformat
 import libavutil/[log, frame]
@@ -5,15 +8,8 @@ import utiltypes
 import os, strformat, strutils, streams
 import sugar
 
-
-#[
-{.passC: "-Ld:/dev/libffmpeg/lib".}
-#{.passL: "-lavcodec -lavformat -lavutil".}
-{.link: "../lib/avcodec.lib".}
-{.link: "../lib/avfilter.lib".}
-{.link: "../lib/avutil.lib".}
-]#
-
+# the pointer math operation is from nim forum post:
+# https://forum.nim-lang.org/t/1188#7366
 template `+`*[T](p: ptr T, off: int): ptr T =
   cast[ptr type(p[])](cast[ByteAddress](p) +% off * sizeof(p[]))
 
@@ -105,8 +101,6 @@ proc main =
   var pFrame = av_frame_alloc()
   var processedPacket = 8
   while av_read_frame(fmtctx, pPacket) >= 0:
-    dump pPacket[].stream_index
-    dump vidStreamId
     if pPacket[].stream_index.int == vidStreamId:
       if avcodec_send_packet(codecContext, pPacket) < 0: continue
       if avcodec_receive_frame(codecContext, pFrame) < 0: continue
