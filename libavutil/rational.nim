@@ -55,10 +55,11 @@ elif defined(macosx):
 else:
   {.push importc, dynlib: "avutil.so(|.55|.56|.57)".}
 
+{.pragma: rational, importc, header: "<libavutil/rational.h>".}
 #{.push rtl.}
 
 type
-  AVRational*  = object
+  AVRational* {.rational.} = object
     num*: cint                 ## /< Numerator
     den*: cint                 ## /< Denominator
 

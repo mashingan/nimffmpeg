@@ -17,12 +17,14 @@ proc render(ctx: ptr AVCodecContext, pkt: ptr AVPacket, frame: ptr AVFrame,
   renderfps: float): uint32
 
 proc vidParamAndCodec(ctx: ptr AVFormatContext, param: var ptr AVCodecParameters,
-  codec: var ptr AVCodec): int =
+  codec: var ptr AVCodec): (int, float) =
   var streams = cast[ptr UncheckedArray[ptr AVStream]](ctx[].streams)
   for i in 0 .. ctx[].nb_streams:
     let localparam = streams[i][].codecpar
     if localparam[].codec_type == AVMEDIA_TYPE_VIDEO:
-      result = int i
+      let rational = streams[i].avg_frame_rate
+      result[0] = int i
+      result[1] = 1.0 / (rational.num.float / rational.den.float)
       param = localparam
       codec = avcodec_find_decoder(localparam[].codec_id)
       break
@@ -35,6 +37,7 @@ proc main =
   var
     pFormatCtx: ptr AVFormatContext
     vidIdx = -1
+    fpsrendering = 0'f
     pCodecCtx: ptr AVCodecContext
     pCodecpar: ptr AVCodecParameters
     pCodec: ptr AVCodec
@@ -57,10 +60,11 @@ proc main =
   if avformat_find_stream_info(pFormatCtx, nil) < 0:
     quit "Couldn't find stream information"
 
-  vidIdx = pFormatCtx.vidParamAndCodec(pCodecpar, pCodec)
+  (vidIdx, fpsrendering) = pFormatCtx.vidParamAndCodec(pCodecpar, pCodec)
   if vidIdx == -1:
     quit "Couldn't find video stream."
   echo &"resolution {pCodecpar[].width} x {pCodecpar[].height}."
+  dump fpsrendering
   if pCodec.isNil:
     quit "Couldn't find codec for video."
   pCodecCtx = avcodec_alloc_context3(pCodec)
@@ -99,7 +103,6 @@ proc main =
   dump rect
   dump filename
   discard av_packet_make_writable(packet)
-  let render24fps = 0.041667 # for 24fps
   var framenum = 0'u32
   var evt = sdl2.defaultEvent
   block pollevent:
@@ -108,7 +111,8 @@ proc main =
         if evt.kind == QuitEvent:
           break pollevent
       if packet[].stream_index.int == vidIdx:
-        framenum = pCodecCtx.render(packet, pFrame, addr rect, texture, renderer, render24fps)
+        framenum = pCodecCtx.render(packet, pFrame,
+          addr rect, texture, renderer, fpsrendering)
   
   avformat_close_input(addr pFormatCtx)
   avformat_free_context(pFormatCtx)
