@@ -45,11 +45,10 @@
 ##
 
 import
-  ../libavutil/[avconfig, frame], avcodec, version
+  ../utiltypes,
+  version
 
 type
-  AVCodecContext* {.bycopy.} = object
-
   AVVDPAU_Render2* = proc (a1: ptr AVCodecContext; a2: ptr AVFrame;
                         a3: ptr VdpPictureInfo; a4: uint32;
                         a5: ptr VdpBitstreamBuffer): cint
@@ -69,8 +68,12 @@ type
 ##  AVVDPAUContext.
 ##
 
+{.pragma: vdpau, header: "<libavcodec/vdpau.h>".}
+
 type
-  AVVDPAUContext* {.bycopy.} = object
+  VdpDecoder* {.importc: "struct $1", vdpau.} = object
+  VdpDecoderRender* {.importc: "struct $1", vdpau.} = object
+  AVVDPAUContext* {.importc, vdpau.} = object
     decoder*: VdpDecoder       ## *
                        ##  VDPAU decoder handle
                        ##
@@ -84,6 +87,13 @@ type
     render*: ptr VdpDecoderRender
     render2*: AVVDPAU_Render2
 
+
+when defined(windows):
+  {.push importc, dynlib: "avcodec(|-55|-56|-57|-58|-59).dll".}
+elif defined(macosx):avcodec
+  {.push importc, dynlib: "avcodec(|.55|.56|.57|.58|.59).dylib".}
+else:avcodec
+  {.push importc, dynlib: "avcodec.so(|.55|.56|.57|.58|.59)".}
 
 ## *
 ##  @brief allocation function for AVVDPAUContext
@@ -133,7 +143,7 @@ proc av_vdpau_bind_context*(avctx: ptr AVCodecContext; device: VdpDevice;
 ##
 
 proc av_vdpau_get_surface_parameters*(avctx: ptr AVCodecContext;
-                                     type: ptr VdpChromaType; width: ptr uint32;
+                                     `type`: ptr VdpChromaType; width: ptr uint32;
                                      height: ptr uint32): cint
 ## *
 ##  Allocate an AVVDPAUContext.

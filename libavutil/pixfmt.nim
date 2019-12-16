@@ -23,6 +23,8 @@
 ##  pixel format definitions
 ##
 
+import avconfig
+
 const
   AVPALETTE_SIZE* = 1024
   AVPALETTE_COUNT* = 256
@@ -297,15 +299,7 @@ const
   AV_PIX_FMT_GRAY8A* = AV_PIX_FMT_YA8
   AV_PIX_FMT_GBR24P* = AV_PIX_FMT_GBRP
 
-##
-## #if AV_HAVE_BIGENDIAN
-## #   define AV_PIX_FMT_NE(be, le) AV_PIX_FMT_##be
-## #else
-## #   define AV_PIX_FMT_NE(be, le) AV_PIX_FMT_##le
-## #endif
-##
-
-when cpuEndian == littleEndian:
+when AV_HAVE_BIGENDIAN == 1:
   template AV_PIX_FMT_NE*(a, b: untyped): AVPixelFormat =
     var res = `AV_PIX_FMT _ b`
     res
@@ -320,7 +314,7 @@ const
   AV_PIX_FMT_BGR32* = AV_PIX_FMT_NE(ABGR, RGBA)
   AV_PIX_FMT_BGR32_1* = AV_PIX_FMT_NE(BGRA, ARGB)
 
-when cpuEndian == littleEndian:
+when AV_HAVE_BIGENDIAN == 1:
   const
     AV_PIX_FMT_0RGB32* = AV_PIX_FMT_BGR0
     AV_PIX_FMT_0BGR32* = AV_PIX_FMT_0BGR

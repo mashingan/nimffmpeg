@@ -52,7 +52,7 @@ type
                            ##                                     just codec level data, otherwise position generation would fail
 
 type
-  AVDiscard* {.avcodec.} = enum ##  We leave some space between them for extensions (drop some
+  AVDiscard* {.avcodec, importc: "enum AVDiscard".} = enum ##  We leave some space between them for extensions (drop some
                  ##  keyframes for intra-only or drop just some bidir frames).
     AVDISCARD_NONE = -16,       ## /< discard nothing
     AVDISCARD_DEFAULT = 0,      ## /< discard useless packets like 0 size packets in avi
@@ -63,7 +63,7 @@ type
     AVDISCARD_ALL = 48          ## /< discard all
 
 type
-  AVAudioServiceType* {.avcodec.} = enum
+  AVAudioServiceType* {.avcodec, importc: "enum AVAudioServiceType".} = enum
     AV_AUDIO_SERVICE_TYPE_MAIN = 0, AV_AUDIO_SERVICE_TYPE_EFFECTS = 1,
     AV_AUDIO_SERVICE_TYPE_VISUALLY_IMPAIRED = 2,
     AV_AUDIO_SERVICE_TYPE_HEARING_IMPAIRED = 3, AV_AUDIO_SERVICE_TYPE_DIALOGUE = 4,
@@ -71,7 +71,7 @@ type
     AV_AUDIO_SERVICE_TYPE_VOICE_OVER = 7, AV_AUDIO_SERVICE_TYPE_KARAOKE = 8, AV_AUDIO_SERVICE_TYPE_NB ## /< Not part of ABI
 
 type
-  AVFieldOrder* {.avcodec.} = enum
+  AVFieldOrder* {.avcodec, importc: "enum AVFieldOrder".} = enum
     AV_FIELD_UNKNOWN, AV_FIELD_PROGRESSIVE, AV_FIELD_TT, ## < Top coded_first, top displayed first
     AV_FIELD_BB,              ## < Bottom coded first, bottom displayed first
     AV_FIELD_TB,              ## < Top coded first, bottom displayed first
@@ -349,7 +349,7 @@ type
 
 
 type
-  AVSampleFormat* {.samplefmt.} = enum
+  AVSampleFormat* {.samplefmt, importc: "enum AVSampleFormat".} = enum
     AV_SAMPLE_FMT_NONE = -1, AV_SAMPLE_FMT_U8, ## /< unsigned 8 bits
     AV_SAMPLE_FMT_S16,        ## /< signed 16 bits
     AV_SAMPLE_FMT_S32,        ## /< signed 32 bits

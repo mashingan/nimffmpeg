@@ -29,6 +29,9 @@ import
   ../libavutil/pixfmt,
   version
 
+type
+  SwsContext* {.importc: "struct SwsContext", header:"<libswscale/swscale.h>".} = object
+
 when defined(windows):
   {.push importc, dynlib: "swscale(|-4|-5|-6).dll".}
 elif defined(macosx):
@@ -127,8 +130,6 @@ type
     lumV*: ptr SwsVector
     chrH*: ptr SwsVector
     chrV*: ptr SwsVector
-
-  SwsContext* {.swscale, importc: "struct SwsContext".} = object
 
 
 ## *
