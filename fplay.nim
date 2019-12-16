@@ -68,23 +68,14 @@ proc main =
     quit "avcodec_parameters_to_context fail!"
   if avcodec_open2(pCodecCtx, pCodec, nil) < 0:
     quit "Couldn't open codec."
+
   dump pCodecCtx[].pix_fmt
   dump pCodecCtx[].codec_id
-  pFrame = av_frame_alloc()
   dump pCodecpar[].width
   dump pCodecpar[].height
-  #[
-  var outbuf = cast[ptr byte](av_malloc(
-    av_image_get_buffer_size(AV_PIX_FMT_YUV420P,
-    pCodecpar[].width,
-    pcodecpar[].height,
-    1)))
-    # disabled because of mismatched destination data type
-  if av_image_fill_arrays(pFrameYUV[].data, pFrameYUV[].linesize, outbuf,
-    AV_PIX_FMT_YUV420P, pCodecCtx[].width, pCodecCtx[].height, 1) < 0:
-      quit "Cannot fill the image arrays"
 
-  ]#
+  pFrame = av_frame_alloc()
+
   packet = av_packet_alloc()
   swidth = pCodecpar[].width
   sheight = pCodecpar[].height
@@ -95,11 +86,7 @@ proc main =
     SDL_WINDOW_OPENGL)
   if screen.isNil:
     quit &"Couldn't create window: {getError()}"
-  #[
-  renderer = createRenderer(screen, -1,
-    Renderer_Accelerated or Renderer_PresentVsync or
-    Renderer_TargetTexture)
-  ]#
+
   renderer = createRenderer(screen, -1, Renderer_Accelerated)
   texture = createTexture(renderer, uint32 SDL_PIXELFORMAT_IYUV,
     SDL_TEXTUREACCESS_STREAMING or SDL_TEXTUREACCESS_TARGET,
@@ -116,25 +103,12 @@ proc main =
   var framenum = 0'u32
   var evt = sdl2.defaultEvent
   block pollevent:
-    while pollEvent(evt):
-      if evt.kind == QuitEvent:
-        break
-      while av_read_frame(pFormatCtx, packet) >= 0:
+    while av_read_frame(pFormatCtx, packet) >= 0:
+      while pollEvent(evt):
         if evt.kind == QuitEvent:
-          break pollevent;
-        if packet[].stream_index.int == vidIdx:
-          framenum = pCodecCtx.render(packet, pFrame, addr rect, texture, renderer, render24fps)
-            #[
-          if framenum mod 500 == 0:
-            discard screen.updateSurface
-            echo &"frame {framenum} renderer/texture to avoid display congestion"
-            renderer = createRenderer(screen, -1, 0)
-            texture = createTexture(renderer, uint32 SDL_PIXELFORMAT_IYUV,
-              SDL_TEXTUREACCESS_STREAMING,
-              cint swidth, cint sheight)
-              ]#
-          if evt.kind == QuitEvent:
-            break pollevent;
+          break pollevent
+      if packet[].stream_index.int == vidIdx:
+        framenum = pCodecCtx.render(packet, pFrame, addr rect, texture, renderer, render24fps)
   
   avformat_close_input(addr pFormatCtx)
   avformat_free_context(pFormatCtx)
