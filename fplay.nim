@@ -12,22 +12,51 @@ import sdl2
 import os, strformat, times
 import sugar
 
+type CodecInfo = (ptr AVcodecParameters, ptr AVCodec, int)
+
 proc render(ctx: ptr AVCodecContext, pkt: ptr AVPacket, frame: ptr AVFrame,
   rect: ptr Rect, texture: TexturePtr, renderer: RendererPtr,
   renderfps: float): uint32
 
-proc vidParamAndCodec(ctx: ptr AVFormatContext, param: var ptr AVCodecParameters,
-  codec: var ptr AVCodec): (int, float) =
-  var streams = cast[ptr UncheckedArray[ptr AVStream]](ctx[].streams)
+proc paramAndCodec(ctx: ptr AVFormatContext, vidcodec, audcodec: var CodecInfo):
+  (int, float) =
+  var
+    streams = cast[ptr UncheckedArray[ptr AVStream]](ctx[].streams)
+    findVideo = false
+    findAudio = false
   for i in 0 .. ctx[].nb_streams:
     let localparam = streams[i][].codecpar
     if localparam[].codec_type == AVMEDIA_TYPE_VIDEO:
       let rational = streams[i].avg_frame_rate
+      vidcodec[2] = int i
       result[0] = int i
       result[1] = 1.0 / (rational.num.float / rational.den.float)
-      param = localparam
-      codec = avcodec_find_decoder(localparam[].codec_id)
+      vidcodec[0] = localparam
+      dump localparam[].codec_id
+      vidcodec[1] = avcodec_find_decoder(localparam[].codec_id)
+      findVideo = true
+    elif localparam[].codec_type == AVMEDIA_TYPE_AUDIO:
+      audcodec[2] = int i
+      audcodec[0] = localparam
+      dump localparam[].codec_id
+      audcodec[1] = avcodec_find_decoder(localparam[].codec_id)
+      findAudio = true
+    if findAudio and findVideo:
       break
+
+proc allocContext(vidctx, audctx: var ptr AVCodecContext,
+  vidinfo, audinfo: CodecInfo) =
+  vidctx = avcodec_alloc_context3(vidinfo[1])
+  audctx = avcodec_alloc_context3(audinfo[1])
+  if avcodec_parameters_to_context(vidctx, vidinfo[0]) < 0:
+    quit "avcodec_parameters_to_context fail!"
+  if avcodec_open2(vidctx, vidinfo[1], nil) < 0:
+    quit "Couldn't open codec."
+  if avcodec_parameters_to_context(audctx, audinfo[0]) < 0:
+    quit "avcodec_parameters_to_context fail!"
+  if avcodec_open2(audctx, audinfo[1], nil) < 0:
+    quit "Couldn't open codec."
+
 
 proc main =
   if paramCount() < 1:
@@ -38,11 +67,13 @@ proc main =
     pFormatCtx: ptr AVFormatContext
     vidIdx = -1
     fpsrendering = 0'f
-    pCodecCtx: ptr AVCodecContext
-    pCodecpar: ptr AVCodecParameters
-    pCodec: ptr AVCodec
-    pFrame: ptr AVFrame
+    pCodecCtx, audioCtx: ptr AVCodecContext
+    pCodecpar, audiopar: ptr AVCodecParameters
+    pCodec, audioCodec: ptr AVCodec
+    pFrame, aframe: ptr AVFrame
     packet: ptr AVPacket
+    vidinfo = (pCodecpar, pCodec, -1)
+    audinfo = (audiopar, audioCodec, -1)
 
   var # sdl part
     swidth = 0
@@ -60,29 +91,33 @@ proc main =
   if avformat_find_stream_info(pFormatCtx, nil) < 0:
     quit "Couldn't find stream information"
 
-  (vidIdx, fpsrendering) = pFormatCtx.vidParamAndCodec(pCodecpar, pCodec)
+  (vidIdx, fpsrendering) = pFormatCtx.paramAndCodec(vidinfo, audinfo)
   if vidIdx == -1:
     quit "Couldn't find video stream."
-  echo &"resolution {pCodecpar[].width} x {pCodecpar[].height}."
+  echo &"resolution {vidinfo[0][].width} x {vidinfo[0][].height}."
   dump fpsrendering
-  if pCodec.isNil:
+  if vidinfo[1].isNil:
     quit "Couldn't find codec for video."
+  #[
   pCodecCtx = avcodec_alloc_context3(pCodec)
   if avcodec_parameters_to_context(pCodecCtx, pCodecpar) < 0:
     quit "avcodec_parameters_to_context fail!"
   if avcodec_open2(pCodecCtx, pCodec, nil) < 0:
     quit "Couldn't open codec."
+  ]#
+  allocContext(pCodecCtx, audioCtx, vidinfo, audinfo)
 
   dump pCodecCtx[].pix_fmt
   dump pCodecCtx[].codec_id
-  dump pCodecpar[].width
-  dump pCodecpar[].height
+  dump vidinfo[0][].width
+  dump vidinfo[0][].height
 
   pFrame = av_frame_alloc()
+  aframe = av_frame_alloc()
 
   packet = av_packet_alloc()
-  swidth = pCodecpar[].width
-  sheight = pCodecpar[].height
+  swidth = vidinfo[0][].width
+  sheight = vidinfo[0][].height
   dump swidth
   dump sheight
   screen = createWindow("FPlay", SDL_WINDOWPOS_UNDEFINED,
@@ -102,7 +137,7 @@ proc main =
   rect.h = cint sheight
   dump rect
   dump filename
-  discard av_packet_make_writable(packet)
+  #discard av_packet_make_writable(packet)
   var framenum = 0'u32
   var evt = sdl2.defaultEvent
   block pollevent:
@@ -113,12 +148,19 @@ proc main =
       if packet[].stream_index.int == vidIdx:
         framenum = pCodecCtx.render(packet, pFrame,
           addr rect, texture, renderer, fpsrendering)
+      elif packet[].stream_index.int == audinfo[2]:
+        # TODO process audio frame
+        discard
+
+      av_packet_unref(packet)
   
   avformat_close_input(addr pFormatCtx)
   avformat_free_context(pFormatCtx)
   av_packet_free(addr packet)
   av_frame_free(addr pFrame)
+  av_frame_free(addr aframe)
   avcodec_free_context(addr pCodecCtx)
+  avcodec_free_context(addr audioCtx)
 
   destroy texture
   destroy renderer

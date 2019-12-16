@@ -1335,7 +1335,7 @@ type
                          ##
     duration*: int64
     pos*: int64              ## /< byte position in stream, -1 if unknown
-    when defined(FF_API_CONVERGENCE_DURATION):
+    when FF_API_CONVERGENCE_DURATION:
       ## *
       ##  @deprecated Same as the duration field, but as int64. This was required
       ##  for Matroska subtitles, whose duration values could overflow when the

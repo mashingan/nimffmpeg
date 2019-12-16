@@ -108,7 +108,7 @@ proc av_cmp_q*(a: AVRational; b: AVRational): cint {.inline.} =
 ##
 
 proc av_q2d*(a: AVRational): cdouble {.inline.} =
-  cast[cdouble](a.num div a.den)
+  a.num.cdouble / a.den.cdouble
 
 ## *
 ##  Reduce a fraction.
