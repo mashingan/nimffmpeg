@@ -3139,7 +3139,7 @@ type
                        ##  Indicates that everything up to the next keyframe
                        ##  should be discarded.
                        ##
-    skipo_keyframe*: cint ## *
+    skip_to_keyframe*: cint ## *
                           ##  Number of samples to skip at the start of the frame decoded from the next packet.
                           ##
     skip_samples*: cint ## *

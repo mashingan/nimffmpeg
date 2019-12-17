@@ -7,7 +7,7 @@ import
   libavformat/avformat,
   libavutil/frame
 
-import sdl2
+import sdl2, sdl2/audio
 
 import os, strformat, times
 import sugar
@@ -18,12 +18,15 @@ proc render(ctx: ptr AVCodecContext, pkt: ptr AVPacket, frame: ptr AVFrame,
   rect: ptr Rect, texture: TexturePtr, renderer: RendererPtr,
   renderfps: float): uint32
 
+proc sample(ctx: ptr AVCodecContext, pkt: ptr AVPacket, frame: ptr AVFrame;
+  dev: AudioDeviceID): uint32
+
 proc paramAndCodec(ctx: ptr AVFormatContext, vidcodec, audcodec: var CodecInfo):
   (int, float) =
   var
     streams = cast[ptr UncheckedArray[ptr AVStream]](ctx[].streams)
-    findVideo = false
-    findAudio = false
+    foundVideo = false
+    foundAudio = false
   for i in 0 .. ctx[].nb_streams:
     let localparam = streams[i][].codecpar
     if localparam[].codec_type == AVMEDIA_TYPE_VIDEO:
@@ -34,14 +37,14 @@ proc paramAndCodec(ctx: ptr AVFormatContext, vidcodec, audcodec: var CodecInfo):
       vidcodec[0] = localparam
       dump localparam[].codec_id
       vidcodec[1] = avcodec_find_decoder(localparam[].codec_id)
-      findVideo = true
+      foundVideo = true
     elif localparam[].codec_type == AVMEDIA_TYPE_AUDIO:
       audcodec[2] = int i
       audcodec[0] = localparam
       dump localparam[].codec_id
       audcodec[1] = avcodec_find_decoder(localparam[].codec_id)
-      findAudio = true
-    if findAudio and findVideo:
+      foundAudio = true
+    if foundAudio and foundVideo:
       break
 
 proc allocContext(vidctx, audctx: var ptr AVCodecContext,
@@ -57,6 +60,12 @@ proc allocContext(vidctx, audctx: var ptr AVCodecContext,
   if avcodec_open2(audctx, audinfo[1], nil) < 0:
     quit "Couldn't open codec."
 
+proc prepareAudioSpec(spec: var AudioSpec) =
+  zeroMem(addr spec, sizeof AudioSpec)
+  spec.freq = 44100
+  spec.format = AUDIO_F32
+  spec.channels = 2
+  spec.samples = 4096
 
 proc main =
   if paramCount() < 1:
@@ -71,9 +80,10 @@ proc main =
     pCodecpar, audiopar: ptr AVCodecParameters
     pCodec, audioCodec: ptr AVCodec
     pFrame, aframe: ptr AVFrame
-    packet: ptr AVPacket
+    packet, audpack: ptr AVPacket
     vidinfo = (pCodecpar, pCodec, -1)
     audinfo = (audiopar, audioCodec, -1)
+    parser: ptr AVCodecParserContext
 
   var # sdl part
     swidth = 0
@@ -82,6 +92,8 @@ proc main =
     renderer: RendererPtr
     texture: TexturePtr
     rect: Rect
+    auddev: AudioDeviceID
+    want, have: AudioSpec
 
   sdl2.init(INIT_EVERYTHING)
   av_register_all()
@@ -98,14 +110,8 @@ proc main =
   dump fpsrendering
   if vidinfo[1].isNil:
     quit "Couldn't find codec for video."
-  #[
-  pCodecCtx = avcodec_alloc_context3(pCodec)
-  if avcodec_parameters_to_context(pCodecCtx, pCodecpar) < 0:
-    quit "avcodec_parameters_to_context fail!"
-  if avcodec_open2(pCodecCtx, pCodec, nil) < 0:
-    quit "Couldn't open codec."
-  ]#
   allocContext(pCodecCtx, audioCtx, vidinfo, audinfo)
+  parser = av_parser_init(cint audinfo[1].id)
 
   dump pCodecCtx[].pix_fmt
   dump pCodecCtx[].codec_id
@@ -116,10 +122,9 @@ proc main =
   aframe = av_frame_alloc()
 
   packet = av_packet_alloc()
+  audpack = av_packet_alloc()
   swidth = vidinfo[0][].width
   sheight = vidinfo[0][].height
-  dump swidth
-  dump sheight
   screen = createWindow("FPlay", SDL_WINDOWPOS_UNDEFINED,
     SDL_WINDOWPOS_UNDEFINED, cint swidth, cint sheight,
     SDL_WINDOW_OPENGL)
@@ -137,7 +142,15 @@ proc main =
   rect.h = cint sheight
   dump rect
   dump filename
-  #discard av_packet_make_writable(packet)
+
+  want.prepareAudioSpec
+  zeroMem(addr have, sizeof AudioSpec)
+  want.samples = uint16 audioCtx[].sample_rate
+  want.channels = uint8 audioCtx[].channels
+  auddev = openAudioDevice(getAudioDeviceName(0, 0), 0, addr want, addr have, 0)
+  if auddev == 0:
+    quit &"Cannot open audio device: {getError()}."
+  auddev.pauseAudioDevice 0
   var framenum = 0'u32
   var evt = sdl2.defaultEvent
   block pollevent:
@@ -149,11 +162,13 @@ proc main =
         framenum = pCodecCtx.render(packet, pFrame,
           addr rect, texture, renderer, fpsrendering)
       elif packet[].stream_index.int == audinfo[2]:
-        # TODO process audio frame
-        discard
+        framenum = audioCtx.sample(packet, aframe, auddev)
 
       av_packet_unref(packet)
   
+  av_parser_close parser
+  av_packet_free(addr packet)
+  av_packet_free(addr audpack)
   avformat_close_input(addr pFormatCtx)
   avformat_free_context(pFormatCtx)
   av_packet_free(addr packet)
@@ -165,6 +180,7 @@ proc main =
   destroy texture
   destroy renderer
   destroy screen
+  closeAudioDevice auddev
   sdl2.quit()
 
 proc render(ctx: ptr AVCodecContext, pkt: ptr AVPacket, frame: ptr AVFrame,
@@ -202,5 +218,15 @@ proc render(ctx: ptr AVCodecContext, pkt: ptr AVPacket, frame: ptr AVFrame,
     dump delaytime
     delay delaytime.uint32
   
+proc sample(ctx: ptr AVCodecContext, pkt: ptr AVPacket, frame: ptr AVFrame;
+  dev: AudioDeviceID): uint32 =
+  if avcodec_send_packet(ctx, pkt) < 0: return
+  if avcodec_receive_frame(ctx, frame) < 0: return
+  dump dev.getQueuedAudioSize
+  result = ctx[].frame_number.uint32
+  for ch in 0 ..< ctx[].channels:
+    if dev.queueAudio(frame[].data[ch], uint32 frame[].linesize[ch]) < 0:
+      echo &"cannot queue audio: {getError()}"
+      return
 
 main()
