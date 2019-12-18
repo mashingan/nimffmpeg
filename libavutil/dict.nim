@@ -26,22 +26,6 @@
 ##   where applicable, which uses AVL trees to achieve O(log n) performance.
 ##
 
-#[
-when defined(windows):
-  {.push importc, header: "<libavutil/dict.h>", dynlib: "avutil-(|55|56|57).dll".}
-elif defined(macosx):
-  {.push importc, header: "<libavutil/dict.h>", dynlib: "avutil(|.55|.56|.57).dylib".}
-else:
-  {.push importc, header: "<libavutil/dict.h>", dynlib: "avutil.so(|.55|.56|.57)".}
-
-when defined(windows):
-  {.push importc, header: "<libavutil/dict.h>".}
-elif defined(macosx):
-  {.push importc, header: "<libavutil/dict.h>".}
-else:
-  {.push importc, header: "<libavutil/dict.h>".}
-]#
-
 when defined(windows):
   {.push importc, dynlib: "avutil-(|55|56|57).dll".}
 elif defined(macosx):

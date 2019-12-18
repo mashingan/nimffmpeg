@@ -169,7 +169,7 @@ const
 ##
 
 const
-  AV_PIX_FMT_FLAG_PSEUDOPAL* = (1 shl 6)
+  AV_PIX_FMT_FLAG_PSEUDOPAL* {.deprecated.} = (1 shl 6)
 
 ## *
 ##  The pixel format has an alpha channel. This is set on all formats that

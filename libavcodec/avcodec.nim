@@ -1363,6 +1363,7 @@ when FF_API_GET_CONTEXT_DEFAULTS:
   ##  allocated for each new use.
   ##
   proc avcodec_get_context_defaults3*(s: ptr AVCodecContext; codec: ptr AVCodec): cint
+    {.deprecated: "Should not be used, closing and opening a codec context not supported".}
 ## *
 ##  Get the AVClass for AVCodecContext. It can be used in combination with
 ##  AV_OPT_SEARCH_FAKE_OBJ for examining options.
@@ -1405,6 +1406,7 @@ when FF_API_COPY_CONTEXT:
   ##
   ## attribute_deprecated
   proc avcodec_copy_context*(dest: ptr AVCodecContext; src: ptr AVCodecContext): cint
+    {.deprecated: "should not be used".}
 ## *
 ##  Allocate a new AVCodecParameters and set its fields to default values
 ##  (unknown/invalid/0). The returned struct must be freed with
@@ -1611,6 +1613,7 @@ when FF_API_AVPACKET_OLD_API:
   ##
   ## attribute_deprecated
   proc av_dup_packet*(pkt: ptr AVPacket): cint
+    {.deprecated: "Use av_packet_ref or av_packet_make_refcounted".}
   ## *
   ##  Copy packet, including contents
   ##
@@ -1620,6 +1623,7 @@ when FF_API_AVPACKET_OLD_API:
   ##
   ## attribute_deprecated
   proc av_copy_packet*(dst: ptr AVPacket; src: ptr AVPacket): cint
+    {.deprecated: "Use av_packet_ref".}
   ## *
   ##  Copy packet side data
   ##
@@ -1629,6 +1633,7 @@ when FF_API_AVPACKET_OLD_API:
   ##
   ## attribute_deprecated
   proc av_copy_packet_side_data*(dst: ptr AVPacket; src: ptr AVPacket): cint
+    {.deprecated: "Use av_packet_copy_props".}
   ## *
   ##  Free a packet.
   ##
@@ -1638,6 +1643,7 @@ when FF_API_AVPACKET_OLD_API:
   ##
   ## attribute_deprecated
   proc av_free_packet*(pkt: ptr AVPacket)
+    {.deprecated: "Use av_packet_unref".}
 ## *
 ##  Allocate new information of a packet.
 ##
@@ -1942,6 +1948,7 @@ proc avcodec_chroma_poso_enum*(xpos, ypos: cint): AVChromaLocation
 
 proc avcodec_decode_audio4*(avctx: ptr AVCodecContext; frame: ptr AVFrame;
                            got_frame_ptr: ptr cint; avpkt: ptr AVPacket): cint
+  {.deprecated: "use pair of avcodec_send_packet and avcodec_receive_frame".}
 ## *
 ##  Decode the video frame of size avpkt->size from avpkt->data into picture.
 ##  Some decoders may support multiple frames in a single AVPacket, such
@@ -1991,6 +1998,7 @@ proc avcodec_decode_audio4*(avctx: ptr AVCodecContext; frame: ptr AVFrame;
 
 proc avcodec_decode_video2*(avctx: ptr AVCodecContext; picture: ptr AVFrame;
                            got_picture_ptr: ptr cint; avpkt: ptr AVPacket): cint
+  {.deprecated: "use pair of avcodec_send_packet and avcodec_receive_frame".}
 ## *
 ##  Decode a subtitle message.
 ##  Return a negative value on error, otherwise return the number of bytes used.
@@ -2327,6 +2335,7 @@ proc av_parser_parse2*(s: ptr AVCodecParserContext; avctx: ptr AVCodecContext;
 proc av_parser_change*(s: ptr AVCodecParserContext; avctx: ptr AVCodecContext;
                       poutbuf: ptr ptr uint8; poutbuf_size: ptr cint;
                       buf: ptr uint8; buf_size: cint; keyframe: cint): cint
+  {.deprecated: "use AVBitStreamFilter".}
 proc av_parser_close*(s: ptr AVCodecParserContext)
 ## *
 ##  @}
@@ -2396,6 +2405,7 @@ proc avcodec_find_encoder_by_name*(name: cstring): ptr AVCodec
 
 proc avcodec_encode_audio2*(avctx: ptr AVCodecContext; avpkt: ptr AVPacket;
                            frame: ptr AVFrame; got_packet_ptr: ptr cint): cint
+  {.deprecated: "use pair of avcodec_send_frame and avcodec_receive_packet".}
 ## *
 ##  Encode a frame of video.
 ##
@@ -2435,6 +2445,7 @@ proc avcodec_encode_audio2*(avctx: ptr AVCodecContext; avpkt: ptr AVPacket;
 
 proc avcodec_encode_video2*(avctx: ptr AVCodecContext; avpkt: ptr AVPacket;
                            frame: ptr AVFrame; got_packet_ptr: ptr cint): cint
+  {.deprecated: "use avcodec_send_frame and avcodec_receive_packet".}
 proc avcodec_encode_subtitle*(avctx: ptr AVCodecContext; buf: ptr uint8;
                              buf_size: cint; sub: ptr AVSubtitle): cint
 ## *
@@ -2451,41 +2462,44 @@ when FF_API_AVPICTURE:
   ##
   ## attribute_deprecated
   proc avpicture_alloc*(picture: ptr AVPicture; pix_fmt: AVPixelFormat; width: cint;
-                       height: cint): cint
+                       height: cint): cint {.deprecated: "unused".}
   ## *
   ##  @deprecated unused
   ##
   ## attribute_deprecated
-  proc avpicture_free*(picture: ptr AVPicture)
+  proc avpicture_free*(picture: ptr AVPicture) {.deprecated: "unused".}
   ## *
   ##  @deprecated use av_image_fill_arrays() instead.
   ##
   ## attribute_deprecated
   proc avpicture_fill*(picture: ptr AVPicture; `ptr`: ptr uint8;
                       pix_fmt: AVPixelFormat; width: cint; height: cint): cint
+    {.deprecated: "use av_image_fill_arrays".}
   ## *
-  ##  @deprecated use av_image_copyo_buffer() instead.
+  ##  @deprecated use av_image_copy_to_buffer() instead.
   ##
   ## attribute_deprecated
   proc avpicture_layout*(src: ptr AVPicture; pix_fmt: AVPixelFormat; width: cint;
                         height: cint; dest: ptr cuchar; dest_size: cint): cint
+    {.deprecated: "use av_image_copy_to_buffer".}
   ## *
   ##  @deprecated use av_image_get_buffer_size() instead.
   ##
   ## attribute_deprecated
   proc avpicture_get_size*(pix_fmt: AVPixelFormat; width: cint; height: cint): cint
+    {.deprecated: "use av_image_get_buffer_size() instead.".}
   ## *
   ##  @deprecated av_image_copy() instead.
   ##
   ## attribute_deprecated
   proc av_picture_copy*(dst: ptr AVPicture; src: ptr AVPicture; pix_fmt: AVPixelFormat;
-                       width: cint; height: cint)
+                       width: cint; height: cint) {.deprecated: "use av_image_copy".}
   ## *
   ##  @deprecated unused
   ##
   ## attribute_deprecated
   proc av_picture_crop*(dst: ptr AVPicture; src: ptr AVPicture; pix_fmt: AVPixelFormat;
-                       top_band: cint; left_band: cint): cint
+                       top_band: cint; left_band: cint): cint {.deprecated: "unused".}
   ## *
   ##  @deprecated unused
   ##
@@ -2493,6 +2507,7 @@ when FF_API_AVPICTURE:
   proc av_picture_pad*(dst: ptr AVPicture; src: ptr AVPicture; height: cint; width: cint;
                       pix_fmt: AVPixelFormat; padtop: cint; padbottom: cint;
                       padleft: cint; padright: cint; color: ptr cint): cint
+                      {.deprecated: "unused".}
   ## *
   ##  @}
   ##
@@ -2518,19 +2533,21 @@ when FF_API_GETCHROMA:
   ## attribute_deprecated
   proc avcodec_get_chroma_sub_sample*(pix_fmt: AVPixelFormat; h_shift: ptr cint;
                                      v_shift: ptr cint)
+    {.deprecated: "Use av_pix_fmt_get_chroma_sub_sample".}
 ## *
 ##  Return a value representing the fourCC code associated to the
 ##  pixel format pix_fmt, or 0 if no associated fourCC code can be
 ##  found.
 ##
 
-proc avcodec_pix_fmto_codecag*(pix_fmt: AVPixelFormat): cuint
+proc avcodec_pix_fmt_to_codec_tag*(pix_fmt: AVPixelFormat): cuint
 ## *
 ##  @deprecated see av_get_pix_fmt_loss()
 ##
 
 proc avcodec_get_pix_fmt_loss*(dst_pix_fmt: AVPixelFormat;
                               src_pix_fmt: AVPixelFormat; has_alpha: cint): cint
+    {.deprecated: "see av_get_pix_fmt_loss()".}
 ## *
 ##  Find the best pixel format to convert to given a certain source pixel
 ##  format.  When converting from one pixel format to another, information loss
@@ -2552,16 +2569,17 @@ proc avcodec_get_pix_fmt_loss*(dst_pix_fmt: AVPixelFormat;
 proc avcodec_find_best_pix_fmt_of_list*(pix_fmt_list: UncheckedArray[AVPixelFormat],
                                        src_pix_fmt: AVPixelFormat, has_alpha: cint,
                                        loss_ptr: ptr cint): AVPixelFormat
-## *
-##  @deprecated see av_find_best_pix_fmt_of_2()
-##
 
 proc avcodec_find_best_pix_fmt_of_2*(dst_pix_fmt1, dst_pix_fmt2, src_pix_fmt: AVPixelFormat,
                                      has_alpha: cint, loss_ptr: ptr cint): AVPixelFormat
-## attribute_deprecated
 
+## *
+##  @deprecated see av_find_best_pix_fmt_of_2()
+##
+## attribute_deprecated
 proc avcodec_find_best_pix_fmt2*(dst_pix_fmt1, dst_pix_fmt2, src_pix_fmt: AVPixelFormat,
                                  has_alpha: cint, loss_ptr: ptr cint): AVPixelFormat
+                                 {.deprecated: "use av_find_best_pix_fmt_of_2".}
 
 proc avcodec_default_get_format*(s: ptr AVCodecContext, fmt: UncheckedArray[AVPixelFormat]): AVPixelFormat
 ## *
@@ -2570,7 +2588,7 @@ proc avcodec_default_get_format*(s: ptr AVCodecContext, fmt: UncheckedArray[AVPi
 
 when FF_API_TAG_STRING:
   ## *
-  ##  Put a string representing the codec tag codecag in buf.
+  ##  Put a string representing the codec tag codec_tag in buf.
   ##
   ##  @param buf       buffer to place codec tag in
   ##  @param buf_size size in bytes of buf
@@ -2581,8 +2599,11 @@ when FF_API_TAG_STRING:
   ##  @deprecated see av_fourcc_make_string() and av_fourcc2str().
   ##
   ## attribute_deprecated
-  proc av_get_codecag_string*(buf: cstring; buf_size: csize; codecag: cuint): csize
+  proc av_get_codec_tag_string*(buf: cstring; buf_size: csize; codecag: cuint): csize
+    {.deprecated: "see av_fourcc_make_string() and av_fourcc2str()".}
+
 proc avcodec_string*(buf: cstring; buf_size: cint; enc: ptr AVCodecContext; encode: cint)
+
 ## *
 ##  Return a name for the specified profile, if available.
 ##
@@ -2590,8 +2611,8 @@ proc avcodec_string*(buf: cstring; buf_size: cint; enc: ptr AVCodecContext; enco
 ##  @param profile the profile value for which a name is requested
 ##  @return A name for the profile if found, NULL otherwise.
 ##
-
 proc av_get_profile_name*(codec: ptr AVCodec; profile: cint): cstring
+
 ## *
 ##  Return a name for the specified profile, if available.
 ##
@@ -2790,6 +2811,7 @@ when FF_API_OLD_BSF:
   ##
   ## attribute_deprecated
   proc av_register_bitstream_filter*(bsf: ptr AVBitStreamFilter)
+    {.deprecated: "Use the new bitstream filtering API (using AVBSFContext)".}
   ## *
   ##  @deprecated the old bitstream filtering API (using AVBitStreamFilterContext)
   ##  is deprecated. Use av_bsf_get_by_name(), av_bsf_alloc(), and av_bsf_init()
@@ -2797,6 +2819,7 @@ when FF_API_OLD_BSF:
   ##
   ## attribute_deprecated
   proc av_bitstream_filter_init*(name: cstring): ptr AVBitStreamFilterContext
+    {.deprecated: "Use av_bsf_get_by_name(), av_bsf_alloc(), and av_bsf_init()".}
   ## *
   ##  @deprecated the old bitstream filtering API (using AVBitStreamFilterContext)
   ##  is deprecated. Use av_bsf_send_packet() and av_bsf_receive_packet() from the
@@ -2807,6 +2830,7 @@ when FF_API_OLD_BSF:
                                   avctx: ptr AVCodecContext; args: cstring;
                                   poutbuf: ptr ptr uint8; poutbuf_size: ptr cint;
                                   buf: ptr uint8; buf_size: cint; keyframe: cint): cint
+    {.deprecated: "Use av_bsf_send_packet() and av_bsf_receive_packet()".}
   ## *
   ##  @deprecated the old bitstream filtering API (using AVBitStreamFilterContext)
   ##  is deprecated. Use av_bsf_free() from the new bitstream filtering API (using
@@ -2814,6 +2838,7 @@ when FF_API_OLD_BSF:
   ##
   ## attribute_deprecated
   proc av_bitstream_filter_close*(bsf: ptr AVBitStreamFilterContext)
+    {.deprecated: "Use av_bsf_free() from the new bitstream filtering API".}
   ## *
   ##  @deprecated the old bitstream filtering API (using AVBitStreamFilterContext)
   ##  is deprecated. Use av_bsf_iterate() from the new bitstream filtering API (using
@@ -2821,6 +2846,7 @@ when FF_API_OLD_BSF:
   ##
   ## attribute_deprecated
   proc av_bitstream_filter_next*(f: ptr AVBitStreamFilter): ptr AVBitStreamFilter
+    {.deprecated: "Use av_bsf_iterate() from the new bitstream filtering API".}
 ## *
 ##  @return a bitstream filter with the specified name or NULL if no such
 ##          bitstream filter exists.
@@ -3045,6 +3071,7 @@ when FF_API_USER_VISIBLE_AVHWACCEL:
   ##
   ## attribute_deprecated
   proc av_register_hwaccel*(hwaccel: ptr AVHWAccel)
+    {.deprecated: "This function doesn't do anything.".}
   ## *
   ##  If hwaccel is NULL, returns the first registered hardware accelerator,
   ##  if hwaccel is non-NULL, returns the next registered hardware accelerator
@@ -3055,6 +3082,7 @@ when FF_API_USER_VISIBLE_AVHWACCEL:
   ##
   ## attribute_deprecated
   proc av_hwaccel_next*(hwaccel: ptr AVHWAccel): ptr AVHWAccel
+    {.deprecated: "AVHWaccel structures contain no user-servicable parts, so this function should not be used.".}
 when FF_API_LOCKMGR:
   ## *
   ##  Lock operation used by lockmgr
@@ -3062,7 +3090,7 @@ when FF_API_LOCKMGR:
   ##  @deprecated Deprecated together with av_lockmgr_register().
   ##
   type
-    AVLockOp*{.avcodec.} = enum
+    AVLockOp*{.avcodec, deprecated: "Deprecated together with av_lockmgr_register().".} = enum
       AV_LOCK_CREATE,         ## /< Create a mutex
       AV_LOCK_OBTAIN,         ## /< Lock the mutex
       AV_LOCK_RELEASE,        ## /< Unlock the mutex
@@ -3095,6 +3123,7 @@ when FF_API_LOCKMGR:
   ##
   ## attribute_deprecated
   proc av_lockmgr_register*(cb: proc (mutex: ptr pointer; op: AVLockOp): cint): cint
+    {.deprecated: "This function does nothing, and always returns 0".}
 ## *
 ##  Get the type of the given codec.
 ##

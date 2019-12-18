@@ -390,7 +390,7 @@ when FF_API_AVPICTURE:
   ##  @deprecated use AVFrame or imgutils functions instead
   ##
   type
-    AVPicture* {.avcodec.}  = object
+    AVPicture* {.avcodec, deprecated: "use AVFrame or imgutils functions instead".}  = object
       data*: array[AV_NUM_DATA_POINTERS, ptr uint8] ## attribute_deprecated
       ## /< pointers to the image data planes
       ## attribute_deprecated
@@ -590,7 +590,7 @@ type
                ##
     color_range*: AVColorRange
     color_primaries*: AVColorPrimaries
-    colorrc*: AVColorTransferCharacteristic ## *
+    color_trc*: AVColorTransferCharacteristic ## *
                                             ##  YUV colorspace type.
                                             ##  - encoding: Set by user
                                             ##  - decoding: Set by libavcodec
@@ -601,7 +601,7 @@ type
                                      ##  - encoding: unused
                                      ##  - decoding: set by libavcodec, read by user.
                                      ##
-    best_effortimestamp*: int64 ## *
+    best_effort_timestamp*: int64 ## *
                                   ##  reordered pos from the last AVPacket that has been input into the decoder
                                   ##  - encoding: unused
                                   ##  - decoding: Read by user.

@@ -209,7 +209,7 @@ proc av_image_get_buffer_size*(pix_fmt: AVPixelFormat; width: cint; height: cint
 ##  (error code) on error
 ##
 
-proc av_image_copyo_buffer*(dst: ptr uint8; dst_size: cint;
+proc av_image_copy_to_buffer*(dst: ptr uint8; dst_size: cint;
                              src_data: array[4, ptr uint8];
                              src_linesize: array[4, cint]; pix_fmt: AVPixelFormat;
                              width: cint; height: cint; align: cint): cint

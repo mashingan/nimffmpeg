@@ -169,4 +169,5 @@ when FF_API_VDPAU_PROFILE:
   ## attribute_deprecated
   proc av_vdpau_get_profile*(avctx: ptr AVCodecContext;
                             profile: ptr VdpDecoderProfile): cint
+    {.deprecated: "Use av_vdpau_bind_context() instead.".}
 ##  @}

@@ -5,14 +5,31 @@ import
   utiltypes,
   libavcodec/avcodec,
   libavformat/avformat,
-  libavutil/frame
+  libavutil/[frame, samplefmt]
 
 import sdl2, sdl2/audio
 
 import os, strformat, times
 import sugar
 
-type CodecInfo = (ptr AVcodecParameters, ptr AVCodec, int)
+type
+  CodecInfo = (ptr AVcodecParameters, ptr AVCodec, int)
+  #[
+  AudioStream = object
+    stream: pointer
+    size: uint32
+    currpos: uint32
+    hwBufSize: uint32
+    packet: ptr AVPacket
+    frame: ptr AVFrame
+
+# TODO: finish the callback
+proc audiocallback(data: pointer, stream: ptr byte, length: cint) {.used.} =
+  var userdata = cast[ptr AudioStream](data)
+  if userdata[].currpos >= userdata[].size:
+    discard
+  copyMem(stream, userdata[].stream, userdata[].size)
+  ]#
 
 proc render(ctx: ptr AVCodecContext, pkt: ptr AVPacket, frame: ptr AVFrame,
   rect: ptr Rect, texture: TexturePtr, renderer: RendererPtr,
@@ -224,9 +241,19 @@ proc sample(ctx: ptr AVCodecContext, pkt: ptr AVPacket, frame: ptr AVFrame;
   if avcodec_receive_frame(ctx, frame) < 0: return
   dump dev.getQueuedAudioSize
   result = ctx[].frame_number.uint32
+  let isPlanar = av_sample_fmt_is_planar(frame[].format.AVSampleFormat) == 1
+  var data = cast[ptr UncheckedArray[byte]](frame[].data[0])
+  var size2: cint
+  var _ = av_samples_get_buffer_size(addr size2, ctx[].channels,
+    frame[].nb_samples, frame[].format.AVSampleFormat, 0)
   for ch in 0 ..< ctx[].channels:
-    if dev.queueAudio(frame[].data[ch], uint32 frame[].linesize[ch]) < 0:
-      echo &"cannot queue audio: {getError()}"
-      return
+    if not isPlanar:
+      if dev.queueAudio(frame[].data[ch], uint32 frame[].linesize[ch]) < 0:
+        echo &"cannot queue audio: {getError()}"
+        return
+    else:
+      if dev.queueAudio(addr(data[ch * size2]), uint32 size2) < 0:
+        echo &"cannot queue audio: {getError()}"
+        return
 
 main()
