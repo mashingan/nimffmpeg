@@ -6,7 +6,7 @@ import os
 # import ffmpeg/libavcodec/qsv
 
 const source = currentSourcePath.parentDir()
-const includepath = "-I" & (source / "../cinclude")
+const includepath = "-I" & (source / "cinclude")
 {.passC: includepath.}
 
 import ffmpeg/utiltypes
