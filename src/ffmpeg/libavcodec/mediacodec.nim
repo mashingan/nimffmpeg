@@ -20,22 +20,35 @@
 ##  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ##
 
-import
-  libavcodec/avcodec
+import ../utiltypes
 
 ## *
 ##  This structure holds a reference to a android/view/Surface object that will
 ##  be used as output by the decoder.
 ##
 ##
+{.pragma: meddec, importc, header: "<libavodec/mediacodec.h>".}
 
 type
-  AVMediaCodecContext* {.bycopy.} = object
+  AVMediaCodecContext* {.meddec.} = object
     surface*: pointer          ## *
                     ##  android/view/Surface object reference.
                     ##
+## *
+##  Opaque structure representing a MediaCodec buffer to render.
+##
+
+type
+  MediaCodecBuffer* {.meddec.} = object
+  AVMediaCodecBuffer* = MediaCodecBuffer
 
 
+when defined(windows):
+  {.push importc, dynlib: "avcodec(|-55|-56|-57|-58|-59).dll".}
+elif defined(macosx):
+  {.push importc, dynlib: "avcodec(|.55|.56|.57|.58|.59).dylib".}
+else:avcodec
+  {.push importc, dynlib: "avcodec.so(|.55|.56|.57|.58|.59)".}
 ## *
 ##  Allocate and initialize a MediaCodec context.
 ##
@@ -65,12 +78,6 @@ proc av_mediacodec_default_init*(avctx: ptr AVCodecContext;
 ##
 
 proc av_mediacodec_default_free*(avctx: ptr AVCodecContext)
-## *
-##  Opaque structure representing a MediaCodec buffer to render.
-##
-
-type
-  AVMediaCodecBuffer* = MediaCodecBuffer
 
 ## *
 ##  Release a MediaCodec buffer and render it to the surface that is associated
@@ -98,4 +105,4 @@ proc av_mediacodec_release_buffer*(buffer: ptr AVMediaCodecBuffer; render: cint)
 ##
 
 proc av_mediacodec_render_buffer_at_time*(buffer: ptr AVMediaCodecBuffer;
-    time: int64_t): cint
+    time: int64): cint

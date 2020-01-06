@@ -28,12 +28,36 @@
 ##  @{
 ##
 
+{.pragma: avfft, importc, header:"<libavcodec/avfft.h>".}
+
 type
+  FFTContext* {.avfft.} = object
   FFTSample* = cfloat
-  FFTComplex* {.bycopy.} = object
+  FFTComplex* {.avfft.} = object
     re*: FFTSample
     im*: FFTSample
 
+##  Real Discrete Fourier Transform
+
+type
+  RDFTContext* {.avfft.} = object
+  RDFTransformType* = enum
+    DFT_R2C, IDFT_C2R, IDFT_R2C, DFT_C2R
+
+##  Discrete Cosine Transform
+
+type
+  DCTContext* {.avfft.} = object
+  DCTTransformType* = enum
+    DCT_II = 0, DCT_III, DCT_I, DST_I
+
+
+when defined(windows):
+  {.push importc, dynlib: "avcodec(|-55|-56|-57|-58|-59).dll".}
+elif defined(macosx):
+  {.push importc, dynlib: "avcodec(|.55|.56|.57|.58|.59).dylib".}
+else:avcodec
+  {.push importc, dynlib: "avcodec.so(|.55|.56|.57|.58|.59)".}
 
 ## *
 ##  Set up a complex FFT.
@@ -59,12 +83,6 @@ proc av_imdct_calc*(s: ptr FFTContext; output: ptr FFTSample; input: ptr FFTSamp
 proc av_imdct_half*(s: ptr FFTContext; output: ptr FFTSample; input: ptr FFTSample)
 proc av_mdct_calc*(s: ptr FFTContext; output: ptr FFTSample; input: ptr FFTSample)
 proc av_mdct_end*(s: ptr FFTContext)
-##  Real Discrete Fourier Transform
-
-type
-  RDFTransformType* = enum
-    DFT_R2C, IDFT_C2R, IDFT_R2C, DFT_C2R
-
 
 
 ## *
@@ -76,12 +94,6 @@ type
 proc av_rdft_init*(nbits: cint; trans: RDFTransformType): ptr RDFTContext
 proc av_rdft_calc*(s: ptr RDFTContext; data: ptr FFTSample)
 proc av_rdft_end*(s: ptr RDFTContext)
-##  Discrete Cosine Transform
-
-type
-  DCTTransformType* = enum
-    DCT_II = 0, DCT_III, DCT_I, DST_I
-
 
 ## *
 ##  Set up DCT.
@@ -94,7 +106,7 @@ type
 ##  @note the first element of the input of DST-I is ignored
 ##
 
-proc av_dct_init*(nbits: cint; type: DCTTransformType): ptr DCTContext
+proc av_dct_init*(nbits: cint; `type`: DCTTransformType): ptr DCTContext
 proc av_dct_calc*(s: ptr DCTContext; data: ptr FFTSample)
 proc av_dct_end*(s: ptr DCTContext)
 ## *

@@ -1,5 +1,6 @@
-import libavformat/avformat
-import libavutil/[dict, log]
+#import libavformat/avformat
+#import libavutil/[dict, log]
+import ffmpeg
 import os, strformat
 
 proc main =

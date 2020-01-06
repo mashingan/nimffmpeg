@@ -17,7 +17,7 @@
 ##
 
 import
-  libavutil/opt
+  ../utiltypes
 
 ## *
 ##  AVDCT context.
@@ -25,11 +25,12 @@ import
 ##        disabled at build time.
 ##
 
+{.pragma: avdct, importc, header:"<libavcodec/avdct.h>".}
+
 type
-  AVDCT* {.bycopy.} = object
+  AVDCT* {.avdct.} = object
     av_class*: ptr AVClass
-    idct*: proc (block: ptr int16_t) ## *
-                                ##  IDCT input permutation.
+    idct*: proc (`block`: ptr int16) ##  IDCT input permutation.
                                 ##  Several optimized IDCTs need a permutated input (relative to the
                                 ##  normal order of the reference IDCT).
                                 ##  This permutation must be performed before the idct_put/add.
@@ -42,9 +43,9 @@ type
                                 ##  - (-> decode coeffs -> zigzag reorder -> simple_mmx_perm -> dequant
                                 ##     -> simple_idct_mmx -> ...)
                                 ##
-    ##  align 16
-    idct_permutation*: array[64, uint8_t]
-    fdct*: proc (block: ptr int16_t) ## *
+                                ##  align 16
+    idct_permutation*: array[64, uint8]
+    fdct*: proc (`block`: ptr int16) ## *
                                 ##  DCT algorithm.
                                 ##  must use AVOptions to set this field.
                                 ##
@@ -54,9 +55,9 @@ type
                   ##  must use AVOptions to set this field.
                   ##
     idct_algo*: cint
-    get_pixels*: proc (block: ptr int16_t; ##  align 16
-                     pixels: ptr uint8_t; ##  align 8
-                     line_size: ptrdiff_t)
+    get_pixels*: proc (`block`: ptr int16; ##  align 16
+                     pixels: ptr uint8; ##  align 8
+                     line_size: csize)
     bits_per_sample*: cint
 
 
@@ -67,6 +68,13 @@ type
 ##
 ##  To free it use av_free()
 ##
+
+when defined(windows):
+  {.push importc, dynlib: "avcodec(|-55|-56|-57|-58|-59).dll".}
+elif defined(macosx):
+  {.push importc, dynlib: "avcodec(|.55|.56|.57|.58|.59).dylib".}
+else:avcodec
+  {.push importc, dynlib: "avcodec.so(|.55|.56|.57|.58|.59)".}
 
 proc avcodec_dct_alloc*(): ptr AVDCT
 proc avcodec_dct_init*(a1: ptr AVDCT): cint

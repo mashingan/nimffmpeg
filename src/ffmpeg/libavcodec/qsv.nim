@@ -19,7 +19,7 @@
 ##
 
 import
-  libavutil/buffer
+  ../libavutil/buffer
 
 ## *
 ##  This struct is used for communicating QSV parameters between libavcodec and
@@ -89,4 +89,10 @@ type
 ##  It must be freed by the caller with av_free().
 ##
 
+when defined(windows):
+  {.push importc, dynlib: "avcodec(|-55|-56|-57|-58|-59).dll".}
+elif defined(macosx):
+  {.push importc, dynlib: "avcodec(|.55|.56|.57|.58|.59).dylib".}
+else:avcodec
+  {.push importc, dynlib: "avcodec.so(|.55|.56|.57|.58|.59)".}
 proc av_qsv_alloc_context*(): ptr AVQSVContext

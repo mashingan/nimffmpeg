@@ -28,8 +28,9 @@
 ##  @author Jordi Ortiz
 ##
 
-import
-  avcodec
+#import avcodec
+import ../libavutil/rational
+import ../libavutil/pixfmt
 
 ## *
 ##  The spec limits the number of wavelet decompositions to 4 for both
@@ -67,26 +68,27 @@ type
     DIRAC_PCODE_INTRA_REF_PICT = 0x000000CC, DIRAC_PCODE_PICTURE_HQ = 0x000000E8,
     DIRAC_PCODE_MAGIC = 0x42424344
 
+{.pragma: dirac, importc, header: "<libavcodec/dirac.h>".}
 
 type
-  DiracVersionInfo* {.bycopy.} = object
+  DiracVersionInfo* {.dirac.} = object
     major*: cint
     minor*: cint
 
-  AVDiracSeqHeader* {.bycopy.} = object
+  AVDiracSeqHeader* {.dirac.} = object
     width*: cuint
     height*: cuint
-    chroma_format*: uint8_t    ## /< 0: 444  1: 422  2: 420
-    interlaced*: uint8_t
-    top_field_first*: uint8_t
-    frame_rate_index*: uint8_t ## /< index into dirac_frame_rate[]
-    aspect_ratio_index*: uint8_t ## /< index into dirac_aspect_ratio[]
-    clean_width*: uint16_t
-    clean_height*: uint16_t
-    clean_left_offset*: uint16_t
-    clean_right_offset*: uint16_t
-    pixel_range_index*: uint8_t ## /< index into dirac_pixel_range_presets[]
-    color_spec_index*: uint8_t ## /< index into dirac_color_spec_presets[]
+    chroma_format*: uint8    ## /< 0: 444  1: 422  2: 420
+    interlaced*: uint8
+    top_field_first*: uint8
+    frame_rate_index*: uint8 ## /< index into dirac_frame_rate[]
+    aspect_ratio_index*: uint8 ## /< index into dirac_aspect_ratio[]
+    clean_width*: uint16
+    clean_height*: uint16
+    clean_left_offset*: uint16
+    clean_right_offset*: uint16
+    pixel_range_index*: uint8 ## /< index into dirac_pixel_range_presets[]
+    color_spec_index*: uint8 ## /< index into dirac_color_spec_presets[]
     profile*: cint
     level*: cint
     framerate*: AVRational
@@ -99,6 +101,12 @@ type
     version*: DiracVersionInfo
     bit_depth*: cint
 
+when defined(windows):
+  {.push importc, dynlib: "avcodec(|-55|-56|-57|-58|-59).dll".}
+elif defined(macosx):
+  {.push importc, dynlib: "avcodec(|.55|.56|.57|.58|.59).dylib".}
+else:avcodec
+  {.push importc, dynlib: "avcodec.so(|.55|.56|.57|.58|.59)".}
 
 ## *
 ##  Parse a Dirac sequence header.
@@ -112,5 +120,5 @@ type
 ##  @return 0 on success, a negative AVERROR code on failure
 ##
 
-proc av_dirac_parse_sequence_header*(dsh: ptr ptr AVDiracSeqHeader; buf: ptr uint8_t;
+proc av_dirac_parse_sequence_header*(dsh: ptr ptr AVDiracSeqHeader; buf: ptr uint8;
                                     buf_size: csize; log_ctx: pointer): cint

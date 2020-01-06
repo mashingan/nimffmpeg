@@ -26,9 +26,12 @@
 ##  Public libavcodec DXVA2 header.
 ##
 
-when not defined(_WIN32_WINNT) or _WIN32_WINNT < 0x00000602:
+when defined(windows):
+  {.pragma: dxva2, importc, header: "<dxva2api.h>".}
+
+when not defined(WIN32_WINNT):
   const
-    _WIN32_WINNT* = 0x00000602
+    WIN32_WINNT* = 0x00000602
 ## *
 ##  @defgroup lavc_codec_hwaccel_dxva2 DXVA2
 ##  @ingroup lavc_codec_hwaccel
@@ -48,7 +51,13 @@ const
 ##
 
 type
-  dxva_context* {.bycopy.} = object
+  IDirectXVideoDecoder* {.dxva2.} = object
+  DXVA2_ConfigPictureDecode* {.dxva2.} = object
+  IDirect3DSurface9* {.importc, header: "<d3d9.h>".} = object
+  LPDIRECT3DSURFACE9* = ptr IDirect3DSurface9
+
+type
+  dxva_context* {.importc, header: "<libavcodec/dxva2.h>".} = object
     decoder*: ptr IDirectXVideoDecoder ## *
                                     ##  DXVA2 decoder object
                                     ##
@@ -64,7 +73,7 @@ type
     surface*: ptr LPDIRECT3DSURFACE9 ## *
                                   ##  A bit field configuring the workarounds needed for using the decoder
                                   ##
-    workaround*: uint64_t      ## *
+    workaround*: uint64      ## *
                         ##  Private to the FFmpeg AVHWAccel implementation
                         ##
     report_id*: cuint

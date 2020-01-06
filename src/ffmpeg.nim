@@ -1,7 +1,8 @@
 import ffmpeg/utiltypes
 import ffmpeg/libavcodec/[avcodec, ac3_parser, adts_parser, avdct,
                           avfft, d3d11va, dirac, dv_profile, dxva2,
-                          jni, mediacodec, qsv, vaapi, vdpau, version,
+                          #jni, mediacodec, qsv, vaapi, vdpau, version,
+                          jni, mediacodec, vaapi, vdpau, version,
                           videotoolbox, vorbis_parser, xvmc]
 
 import ffmpeg/libavdevice/avdevice

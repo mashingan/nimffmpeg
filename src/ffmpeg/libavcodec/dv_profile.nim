@@ -16,8 +16,8 @@
 ##  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ##
 
-import
-  libavutil/pixfmt, libavutil/rational, avcodec
+import ../libavutil/pixfmt
+import ../libavutil/rational
 
 ##  minimum number of bytes to read from a DV stream in order to
 ##  determine the profile
@@ -33,7 +33,7 @@ const
 ##
 
 type
-  AVDVProfile* {.bycopy.} = object
+  AVDVProfile* {.importc, header: "<libavformat/dv_profile.>".} = object
     dsf*: cint                 ##  value of the dsf in the DV header
     video_stype*: cint         ##  stype for VAUX source pack
     frame_size*: cint          ##  total size of one frame in bytes
@@ -46,14 +46,21 @@ type
     sar*: array[2, AVRational]  ##  sample aspect ratios for 4:3 and 16:9
     pix_fmt*: AVPixelFormat    ##  picture pixel format
     bpm*: cint                 ##  blocks per macroblock
-    block_sizes*: ptr uint8_t   ##  AC block sizes, in bits
+    block_sizes*: ptr uint8   ##  AC block sizes, in bits
     audio_stride*: cint        ##  size of audio_shuffle table
     audio_min_samples*: array[3, cint] ##  min amount of audio samples
                                     ##  for 48kHz, 44.1kHz and 32kHz
     audio_samples_dist*: array[5, cint] ##  how many samples are supposed to be
                                      ##  in each frame in a 5 frames window
-    audio_shuffle*: array[9, uint8_t] ##  PCM shuffling table
+    audio_shuffle*: array[9, uint8] ##  PCM shuffling table
 
+
+when defined(windows):
+  {.push importc, dynlib: "avcodec(|-55|-56|-57|-58|-59).dll".}
+elif defined(macosx):
+  {.push importc, dynlib: "avcodec(|.55|.56|.57|.58|.59).dylib".}
+else:avcodec
+  {.push importc, dynlib: "avcodec.so(|.55|.56|.57|.58|.59)".}
 
 ## *
 ##  Get a DV profile for the provided compressed frame.
@@ -64,7 +71,7 @@ type
 ##  @return the DV profile for the supplied data or NULL on failure
 ##
 
-proc av_dv_frame_profile*(sys: ptr AVDVProfile; frame: ptr uint8_t; buf_size: cuint): ptr AVDVProfile
+proc av_dv_frame_profile*(sys: ptr AVDVProfile; frame: ptr uint8; buf_size: cuint): ptr AVDVProfile
 ## *
 ##  Get a DV profile for the provided stream parameters.
 ##

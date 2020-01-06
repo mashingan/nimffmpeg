@@ -27,9 +27,13 @@
 ##  Public libavcodec D3D11VA header.
 ##
 
-when not defined(_WIN32_WINNT) or _WIN32_WINNT < 0x00000602:
+when defined(windows):
+  import winlean
+  {.pragma: d3d11, importc, header: "<d3d11.h>".}
+
+when not defined(WIN32_WINNT):# or WIN32_WINNT < 0x00000602:
   const
-    _WIN32_WINNT* = 0x00000602
+    WIN32_WINNT* = 0x00000602
 ## *
 ##  @defgroup lavc_codec_hwaccel_d3d11va Direct3D11
 ##  @ingroup lavc_codec_hwaccel
@@ -51,6 +55,12 @@ const
 ##
 
 type
+  ID3D11VideoContext* {.d3d11.} = object
+  ID3D11VideoDecoder* {.d3d11.} = object
+  D3D11_VIDEO_DECODER_CONFIG* {.d3d11.} = object
+  ID3D11VideoDecoderOutputView* {.d3d11.} = object
+
+type
   AVD3D11VAContext* {.bycopy.} = object
     decoder*: ptr ID3D11VideoDecoder ## *
                                   ##  D3D11 decoder object
@@ -70,7 +80,7 @@ type
     surface*: ptr ptr ID3D11VideoDecoderOutputView ## *
                                                ##  A bit field configuring the workarounds needed for using the decoder
                                                ##
-    workaround*: uint64_t      ## *
+    workaround*: uint64      ## *
                         ##  Private to the FFmpeg AVHWAccel implementation
                         ##
     report_id*: cuint          ## *
@@ -86,6 +96,7 @@ type
 ##
 
 proc av_d3d11va_alloc_context*(): ptr AVD3D11VAContext
+  {.importc, dynlib: "d3d11.dll".}
 ## *
 ##  @}
 ##

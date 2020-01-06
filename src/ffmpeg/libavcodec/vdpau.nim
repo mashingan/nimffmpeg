@@ -49,6 +49,14 @@ import
   version
 
 type
+  VdpPictureInfo* {.importc, header: "<vdpau/vdpau.h>".} = object
+  VdpBitStreamBuffer* {.importc, header: "<vdpau/vdpau.h>".} = object
+  VdpDevice* {.importc, header: "<vdpau/vdpau.h>".} = object
+  VdpGetProcAddress* {.importc, header: "<vdpau/vdpau.h>".} = object
+  VdpChromaType* {.importc, header: "<vdpau/vdpau.h>".} = object
+  VdpDecoderProfile* {.importc, header: "<vdpau/vdpau.h>".} = object
+
+type
   AVVDPAU_Render2* = proc (a1: ptr AVCodecContext; a2: ptr AVFrame;
                         a3: ptr VdpPictureInfo; a4: uint32;
                         a5: ptr VdpBitstreamBuffer): cint

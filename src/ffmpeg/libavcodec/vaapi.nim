@@ -27,8 +27,7 @@
 ##  Public libavcodec VA API header.
 ##
 
-import
-  libavutil/attributes, version
+import version
 
 when FF_API_STRUCT_VAAPI_CONTEXT:
   ## *
@@ -49,7 +48,7 @@ when FF_API_STRUCT_VAAPI_CONTEXT:
   ##
   ## struct attribute_deprecated vaapi_context {
   type
-    vaapi_context* {.bycopy.} = object
+    vaapi_context* {.importc, header: "<libavcodec/vaapi.h>".} = object
       display*: pointer        ## *
                       ##  Window system dependent data
                       ##
@@ -62,12 +61,12 @@ when FF_API_STRUCT_VAAPI_CONTEXT:
       ##  - encoding: unused
       ##  - decoding: Set by user
       ##
-      config_id*: uint32_t     ## *
+      config_id*: uint32     ## *
                          ##  Context ID (video decode pipeline)
                          ##
                          ##  - encoding: unused
                          ##  - decoding: Set by user
                          ##
-      context_id*: uint32_t
+      context_id*: uint32
 
   ##  @}
