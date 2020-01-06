@@ -1,5 +1,10 @@
 import os
 
+# qsv is depend on intel media sdk library hence not included.
+# in case of someone want to use it, they can directly import it
+# like:
+# import ffmpeg/libavcodec/qsv
+
 const source = currentSourcePath.parentDir()
 const includepath = "-I" & (source / "../cinclude")
 {.passC: includepath.}
@@ -29,7 +34,7 @@ import ffmpeg/libavutil/[log, avutil, common, dict, frame, hwcontext,
                          channel_layout, avconfig, buffer, adler32,
                          aes, aes_ctr, imgutils]
 
-#add libpostproc import
+import ffmpeg/libpostproc/postprocess
 
 import ffmpeg/libswresample/swresample
 
@@ -59,6 +64,8 @@ export log, avutil, common, dict, frame, hwcontext,
        opt, pixdesc, pixfmt, rational, samplefmt,
        channel_layout, avconfig, buffer, adler32,
        aes, aes_ctr, imgutils
+
+export postprocess
 
 export swresample
 
