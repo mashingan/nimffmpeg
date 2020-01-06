@@ -37,9 +37,9 @@ import
 
 when defined(windows):
   {.push importc, dynlib: "avcodec(|-55|-56|-57|-58|-59).dll".}
-elif defined(macosx):avcodec
+elif defined(macosx):
   {.push importc, dynlib: "avcodec(|.55|.56|.57|.58|.59).dylib".}
-else:avcodec
+else:
   {.push importc, dynlib: "avcodec.so(|.55|.56|.57|.58|.59)".}
 
 {.pragma: avcodec, importc, header:"<libavcodec/avcodec.h>".}
