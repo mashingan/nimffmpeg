@@ -1,5 +1,3 @@
-{.passC: "-I../cinclude".}
-
 import ffmpeg/utiltypes
 
 import ffmpeg/libavcodec/[avcodec, ac3_parser, adts_parser, avdct,
