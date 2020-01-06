@@ -1,7 +1,10 @@
+#[
 import libavcodec/avcodec
 import libavformat/avformat
 import libavutil/[error, frame, pixfmt]
 import utiltypes
+]#
+import ffmpeg
 import streams, strformat, os, strutils
 
 proc fetchFrame(fmt: ptr AVFormatContext, frame: ptr AVFrame,
@@ -75,7 +78,7 @@ proc saveFrameAsJpeg(fmt: ptr AVFormatContext, ctx: ptr AVCodecContext,
 proc main =
   if paramCount() < 2:
     quit(&"Usage: {getAppFilename()} <input_file> <frameno = default 1>" &
-        "example program to save a specific frame to jpg.\n") 
+        "example program to save a specific frame to jpg.\n")
 
   var frameno = 1
   if paramCount() == 2:
