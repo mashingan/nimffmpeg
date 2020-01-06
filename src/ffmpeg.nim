@@ -1,3 +1,9 @@
+import os
+
+const source = currentSourcePath.parentDir()
+const includepath = "-I" & (source / "cinclude")
+{.passC: includepath.}
+
 import ffmpeg/utiltypes
 
 import ffmpeg/libavcodec/[avcodec, ac3_parser, adts_parser, avdct,
