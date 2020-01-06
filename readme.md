@@ -40,12 +40,8 @@ for i in 0 .. pFormatCtx[].nb_streams:
 
 The index can be used later to know which stream index packet we'll process later.
 
-Any others examples you found should be applicable with this binding too.
+Any others examples you found should be applicable with this binding too. Several worked examples
+also availables in `examples` folder.
 
 ## To use
-To able to compile and work with, make sure we installed ffmpeg library dev and
-shared lib to run it.
-
-If you installed the ffmpeg library dev in different path than usual (e.g. `/usr/include`),
-make sure pass the include path in your code (with `passC` pragma, `{.passc: "-Iyour/include/path".}`)
-or in option during compilation (`--passC:"-Iyour/include/path"`).
+To able to compile and work with, make sure we installed shared lib to run it.
