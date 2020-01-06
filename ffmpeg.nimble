@@ -5,7 +5,8 @@ author        = "Rahmatullah"
 description   = "Ffmpeg C APIs binding"
 license       = "MIT"
 srcDir        = "src"
-installDirs   = @["cinclude"]
+installDirs   = @["cinclude", "ffmpeg"]
+installFiles  = @["ffmpeg.nim"]
 
 # Dependencies
 
