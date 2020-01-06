@@ -15,6 +15,9 @@ when defined(windows):
 else:
   import ffmpeg/libavcodec/[vaapi, vdpau, xvmc]
 
+when defined(macosx):
+  import ffmpeg/libavcodec/videotoolbox
+
 import ffmpeg/libavdevice/avdevice
 
 import ffmpeg/libavfilter/[avfilter, buffersink, buffersrc]
@@ -42,6 +45,9 @@ when defined(windows):
   export d3d11va, dxva2
 else:
   export vaapi, vdpau, xvmc
+
+when defined(macosx):
+  export videotoolbox
 
 export avdevice
 
