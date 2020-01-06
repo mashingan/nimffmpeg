@@ -27,16 +27,27 @@
 ##  Allocate and initialize the Vorbis parser using headers in the extradata.
 ##
 
-proc av_vorbis_parse_init*(extradata: ptr uint8_t; extradata_size: cint): ptr AVVorbisParseContext
+const
+  VORBIS_FLAG_HEADER* = 0x00000001
+  VORBIS_FLAG_COMMENT* = 0x00000002
+  VORBIS_FLAG_SETUP* = 0x00000004
+
+type
+  AVVorbisParseContext* {.importc, header: "<libavcodec/vorbis_parser.h>".} = object
+
+when defined(windows):
+  {.push importc, dynlib: "avcodec(|-55|-56|-57|-58|-59).dll".}
+elif defined(macosx):avcodec
+  {.push importc, dynlib: "avcodec(|.55|.56|.57|.58|.59).dylib".}
+else:avcodec
+  {.push importc, dynlib: "avcodec.so(|.55|.56|.57|.58|.59)".}
+
+proc av_vorbis_parse_init*(extradata: ptr uint8; extradata_size: cint): ptr AVVorbisParseContext
 ## *
 ##  Free the parser and everything associated with it.
 ##
 
 proc av_vorbis_parse_free*(s: ptr ptr AVVorbisParseContext)
-const
-  VORBIS_FLAG_HEADER* = 0x00000001
-  VORBIS_FLAG_COMMENT* = 0x00000002
-  VORBIS_FLAG_SETUP* = 0x00000004
 
 ## *
 ##  Get the duration for a Vorbis packet.
@@ -50,7 +61,7 @@ const
 ##  @param flags    flags for special frames
 ##
 
-proc av_vorbis_parse_frame_flags*(s: ptr AVVorbisParseContext; buf: ptr uint8_t;
+proc av_vorbis_parse_frame_flags*(s: ptr AVVorbisParseContext; buf: ptr uint8;
                                  buf_size: cint; flags: ptr cint): cint
 ## *
 ##  Get the duration for a Vorbis packet.
@@ -60,6 +71,6 @@ proc av_vorbis_parse_frame_flags*(s: ptr AVVorbisParseContext; buf: ptr uint8_t;
 ##  @param buf_size size of the buffer
 ##
 
-proc av_vorbis_parse_frame*(s: ptr AVVorbisParseContext; buf: ptr uint8_t;
+proc av_vorbis_parse_frame*(s: ptr AVVorbisParseContext; buf: ptr uint8;
                            buf_size: cint): cint
 proc av_vorbis_parse_reset*(s: ptr AVVorbisParseContext)

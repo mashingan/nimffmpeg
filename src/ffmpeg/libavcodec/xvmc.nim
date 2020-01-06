@@ -24,8 +24,7 @@
 ##  Public libavcodec XvMC header.
 ##
 
-import
-  libavutil/attributes, version, avcodec
+#import libavutil/attributes, version, avcodec
 
 ## *
 ##  @defgroup lavc_codec_hwaccel_xvmc XvMC

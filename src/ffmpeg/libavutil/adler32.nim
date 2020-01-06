@@ -23,8 +23,7 @@
 ##  Public header for Adler-32 hash function implementation.
 ##
 
-import
-  attributes
+#import attributes
 
 ## *
 ##  @defgroup lavu_adler32 Adler-32
@@ -46,7 +45,15 @@ import
 ##  @return      updated checksum
 ##
 
-proc av_adler32_update*(adler: culong; buf: ptr uint8_t; len: cuint): culong
+
+when defined(windows):
+  {.push importc, dynlib: "avutil(|-55|-56|-57).dll".}
+elif defined(macosx):
+  {.push importc, dynlib: "avutil(|.55|.56|.57).dylib".}
+else:
+  {.push importc, dynlib: "avutil.so(|.55|.56|.57)".}
+
+proc av_adler32_update*(adler: culong; buf: ptr uint8; len: cuint): culong
   ## unsigned int len) av_pure;
 ## *
 ##  @}

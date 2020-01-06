@@ -25,7 +25,7 @@
 ##
 
 import
-  rational, avutil, dict, ../utiltypes
+  rational, avutil, dict, ../utiltypes, pixfmt
 
 when defined(windows):
   {.push importc, dynlib: "avformat(|-55|-56|-57|-58).dll".}

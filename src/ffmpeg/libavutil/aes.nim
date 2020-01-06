@@ -18,8 +18,7 @@
 ##  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ##
 
-import
-  attributes, version
+#import attributes, version
 
 ## *
 ##  @defgroup lavu_aes AES
@@ -30,7 +29,14 @@ import
 var av_aes_size*: cint
 
 type
-  AVAES* {.bycopy.} = object
+  AVAES* {.importc, header: "<libavutil/aes.h>".} = object
+
+when defined(windows):
+  {.push importc, dynlib: "avutil(|-55|-56|-57).dll".}
+elif defined(macosx):
+  {.push importc, dynlib: "avutil(|.55|.56|.57).dylib".}
+else:
+  {.push importc, dynlib: "avutil.so(|.55|.56|.57)".}
 
 
 ## *
@@ -44,7 +50,7 @@ proc av_aes_alloc*(): ptr AVAES
 ##  @param decrypt 0 for encryption, 1 for decryption
 ##
 
-proc av_aes_init*(a: ptr AVAES; key: ptr uint8_t; key_bits: cint; decrypt: cint): cint
+proc av_aes_init*(a: ptr AVAES; key: ptr uint8; key_bits: cint; decrypt: cint): cint
 ## *
 ##  Encrypt or decrypt a buffer using a previously initialized context.
 ##  @param count number of 16 byte blocks
@@ -54,8 +60,8 @@ proc av_aes_init*(a: ptr AVAES; key: ptr uint8_t; key_bits: cint; decrypt: cint)
 ##  @param decrypt 0 for encryption, 1 for decryption
 ##
 
-proc av_aes_crypt*(a: ptr AVAES; dst: ptr uint8_t; src: ptr uint8_t; count: cint;
-                  iv: ptr uint8_t; decrypt: cint)
+proc av_aes_crypt*(a: ptr AVAES; dst: ptr uint8; src: ptr uint8; count: cint;
+                  iv: ptr uint8; decrypt: cint)
 ## *
 ##  @}
 ##

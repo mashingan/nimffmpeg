@@ -1,10 +1,7 @@
 # This example is taken from ffmpeg tutorial page
 # https://github.com/leandromoreira/ffmpeg-libav-tutorial
 
-import libavcodec/avcodec
-import libavformat/avformat
-import libavutil/[log, frame]
-import utiltypes
+import ffmpeg
 import os, strformat, strutils, streams
 import sugar
 

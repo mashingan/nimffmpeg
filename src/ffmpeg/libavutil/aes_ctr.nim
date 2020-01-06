@@ -19,16 +19,21 @@
 ##  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
 ##
 
-import
-  attributes, version
 
 const
   AES_CTR_KEY_SIZE* = (16)
   AES_CTR_IV_SIZE* = (8)
 
 type
-  AVAESCTR* {.bycopy.} = object
+  AVAESCTR* {.importc, header: "<libavutil/aes_ctr.h>".} = object
 
+
+when defined(windows):
+  {.push importc, dynlib: "avutil(|-55|-56|-57).dll".}
+elif defined(macosx):
+  {.push importc, dynlib: "avutil(|.55|.56|.57).dylib".}
+else:
+  {.push importc, dynlib: "avutil.so(|.55|.56|.57)".}
 
 ## *
 ##  Allocate an AVAESCTR context.
@@ -40,7 +45,7 @@ proc av_aes_ctr_alloc*(): ptr AVAESCTR
 ##  @param key encryption key, must have a length of AES_CTR_KEY_SIZE
 ##
 
-proc av_aes_ctr_init*(a: ptr AVAESCTR; key: ptr uint8_t): cint
+proc av_aes_ctr_init*(a: ptr AVAESCTR; key: ptr uint8): cint
 ## *
 ##  Release an AVAESCTR context.
 ##
@@ -53,12 +58,12 @@ proc av_aes_ctr_free*(a: ptr AVAESCTR)
 ##  @param size the size of src and dst
 ##
 
-proc av_aes_ctr_crypt*(a: ptr AVAESCTR; dst: ptr uint8_t; src: ptr uint8_t; size: cint)
+proc av_aes_ctr_crypt*(a: ptr AVAESCTR; dst: ptr uint8; src: ptr uint8; size: cint)
 ## *
 ##  Get the current iv
 ##
 
-proc av_aes_ctr_get_iv*(a: ptr AVAESCTR): ptr uint8_t
+proc av_aes_ctr_get_iv*(a: ptr AVAESCTR): ptr uint8
 ## *
 ##  Generate a random iv
 ##
@@ -68,12 +73,12 @@ proc av_aes_ctr_set_random_iv*(a: ptr AVAESCTR)
 ##  Forcefully change the 8-byte iv
 ##
 
-proc av_aes_ctr_set_iv*(a: ptr AVAESCTR; iv: ptr uint8_t)
+proc av_aes_ctr_set_iv*(a: ptr AVAESCTR; iv: ptr uint8)
 ## *
 ##  Forcefully change the "full" 16-byte iv, including the counter
 ##
 
-proc av_aes_ctr_set_full_iv*(a: ptr AVAESCTR; iv: ptr uint8_t)
+proc av_aes_ctr_set_full_iv*(a: ptr AVAESCTR; iv: ptr uint8)
 ## *
 ##  Increment the top 64 bit of the iv (performed after each frame)
 ##

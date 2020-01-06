@@ -1,11 +1,7 @@
 # the tutorial repo is from
 # https://github.com/leixiaohua1020/simplest_ffmpeg_player
 
-import
-  utiltypes,
-  libavcodec/avcodec,
-  libavformat/avformat,
-  libavutil/[frame, samplefmt]
+import ffmpeg
 
 import sdl2, sdl2/audio
 
