@@ -17,7 +17,7 @@ else:
 
 import ffmpeg/libavdevice/avdevice
 
-#add libavfilter import
+import ffmpeg/libavfilter/[avfilter, buffersink, buffersrc]
 
 import ffmpeg/libavformat/[avformat, avio]
 
@@ -44,6 +44,8 @@ else:
   export vaapi, vdpau, xvmc
 
 export avdevice
+
+export avfilter, buffersink, buffersrc
 
 export avformat, avio
 
