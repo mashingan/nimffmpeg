@@ -7,11 +7,11 @@ const includepath = "-I" & (source / "../cinclude")
 import ffmpeg/utiltypes
 
 import ffmpeg/libavcodec/[avcodec, ac3_parser, adts_parser, avdct,
-                          avfft, dirac, dv_profile, dxva2,
-                          jni, mediacodec, vorbis_parser]
+                          avfft, dirac, dv_profile, jni,
+                          mediacodec, vorbis_parser]
 
 when defined(windows):
-  import ffmpeg/libavcodec/d3d11va
+  import ffmpeg/libavcodec/[d3d11va, dxva2]
 else:
   import ffmpeg/libavcodec/[vaapi, vdpau, xvmc]
 
@@ -35,11 +35,11 @@ import ffmpeg/libswscale/swscale
 export utiltypes
 
 export avcodec, ac3_parser, adts_parser, avdct,
-       avfft, dirac, dv_profile, dxva2,
-       jni, mediacodec, vorbis_parser
+       avfft, dirac, dv_profile, jni,
+       mediacodec, vorbis_parser
 
 when defined(windows):
-  export d3d11va
+  export d3d11va, dxva2
 else:
   export vaapi, vdpau, xvmc
 
