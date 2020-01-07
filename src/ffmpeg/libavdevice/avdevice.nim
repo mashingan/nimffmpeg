@@ -21,9 +21,9 @@ import ../utiltypes
 
 when defined(windows):
   {.push importc, dynlib: "avdevice(|-55|-56|-57|-58).dll".}
-elif defined(macosx):device
+elif defined(macosx):
   {.push importc, dynlib: "avdevice(|.55|.56|.57|.58).dylib".}
-else:device
+else:
   {.push importc, dynlib: "avdevice.so(|.55|.56|.57|.58)".}
 
 ## *

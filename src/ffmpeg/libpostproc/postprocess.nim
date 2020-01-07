@@ -52,9 +52,9 @@ else:
 
 when defined(windows):
   {.push importc, dynlib: "postproc(|-53|-54|-55|-56|-57).dll".}
-elif defined(macosx):postproc
+elif defined(macosx):
   {.push importc, dynlib: "postproc(|.53|.54|.55|.56|.57).dylib".}
-else:postproc
+else:
   {.push importc, dynlib: "postproc.so(|.53|.54|.55|.56|.57)".}
 
 proc pp_postprocess*(src: array[3, ptr uint8]; srcStride: array[3, cint];
