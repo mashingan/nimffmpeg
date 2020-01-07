@@ -28,28 +28,7 @@ elif defined(macosx):
   {.pragma: rtl, importc, dynlib: "avutil(|.55|.56|.57).dylib".}
 else:
   #{.push importc, dynli.}
-  {.pragma: rtl, importc, dynlib: "avutil.so(|.55|.56|.57)".}
-
-#[
-when defined(windows):
-  #{.push importc, dynlib: "avutil-(|55|56|57).dll".}
-  {.pragma: rtl, importc, header: "<libavutil/log.h", dynlib: "avutil-(|55|56|57).dll".}
-elif defined(macosx):
-  #{.push importc, dynlib: "avutil(|.55|.56|.57).dylib".}
-  {.pragma: rtl, importc, header: "<libavutil/log.h", dynlib: "avutil(|.55|.56|.57).dylib".}
-else:
-  #{.push importc, dynlib: "libavutil.so(|.55|.56|.57)".}
-  {.pragma: rtl, importc, header: "<libavutil/log.h", dynlib: "avutil.so(|.55|.56|.57)".}
-]#
-
-#[
-when defined(windows):
-  {.pragma: rtl, importc, header: "<libavutil/dict.h>".}
-elif defined(macosx):
-  {.pragma: rtl, importc, header: "<libavutil/dict.h>".}
-else:
-  {.pragma: rtl, importc, header: "<libavutil/dict.h>".}
-]#
+  {.pragma: rtl, importc, dynlib: "libavutil.so(|.55|.56|.57)".}
 
 
 template AV_IS_INPUT_DEVICE*(category: untyped): untyped =
