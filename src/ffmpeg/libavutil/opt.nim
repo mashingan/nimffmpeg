@@ -32,7 +32,7 @@ when defined(windows):
 elif defined(macosx):
   {.push importc, dynlib: "avformat(|.55|.56|.57|.58).dylib".}
 else:
-  {.push importc, dynlib: "avformat.so(|.55|.56|.57|.58)".}
+  {.push importc, dynlib: "libavformat.so(|.55|.56|.57|.58)".}
 
 ## *
 ##  @defgroup avoptions AVOptions

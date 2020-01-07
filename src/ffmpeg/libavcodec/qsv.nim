@@ -94,5 +94,5 @@ when defined(windows):
 elif defined(macosx):
   {.push importc, dynlib: "avcodec(|.55|.56|.57|.58|.59).dylib".}
 else:
-  {.push importc, dynlib: "avcodec.so(|.55|.56|.57|.58|.59)".}
+  {.push importc, dynlib: "libavcodec.so(|.55|.56|.57|.58|.59)".}
 proc av_qsv_alloc_context*(): ptr AVQSVContext

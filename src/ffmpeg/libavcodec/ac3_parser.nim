@@ -29,7 +29,7 @@ when defined(windows):
 elif defined(macosx):
   {.push importc, dynlib: "avcodec(|.55|.56|.57|.58|.59).dylib".}
 else:
-  {.push importc, dynlib: "avcodec.so(|.55|.56|.57|.58|.59)".}
+  {.push importc, dynlib: "libavcodec.so(|.55|.56|.57|.58|.59)".}
 
 proc av_ac3_parse_header*(buf: ptr uint8; size: csize; bitstream_id: ptr uint8;
                          frame_size: ptr uint16): cint

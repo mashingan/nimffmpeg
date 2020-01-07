@@ -38,7 +38,7 @@ elif defined(macosx):
   #{.push importc, dynlib: "avutil(|.55|.56|.57).dylib".}
   {.pragma: rtl, importc, header: "<libavutil/log.h", dynlib: "avutil(|.55|.56|.57).dylib".}
 else:
-  #{.push importc, dynlib: "avutil.so(|.55|.56|.57)".}
+  #{.push importc, dynlib: "libavutil.so(|.55|.56|.57)".}
   {.pragma: rtl, importc, header: "<libavutil/log.h", dynlib: "avutil.so(|.55|.56|.57)".}
 ]#
 

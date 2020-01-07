@@ -55,7 +55,7 @@ when defined(windows):
 elif defined(macosx):
   {.push importc, dynlib: "postproc(|.53|.54|.55|.56|.57).dylib".}
 else:
-  {.push importc, dynlib: "postproc.so(|.53|.54|.55|.56|.57)".}
+  {.push importc, dynlib: "libpostproc.so(|.53|.54|.55|.56|.57)".}
 
 proc pp_postprocess*(src: array[3, ptr uint8]; srcStride: array[3, cint];
                     dst: array[3, ptr uint8]; dstStride: array[3, cint];

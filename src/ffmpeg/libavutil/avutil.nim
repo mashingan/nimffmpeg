@@ -172,7 +172,7 @@ when defined(windows):
 elif defined(macosx):
   {.push importc, dynlib: "avutil(|.55|.56|.57).dylib".}
 else:
-  {.push importc, dynlib: "avutil.so(|.55|.56|.57)".}
+  {.push importc, dynlib: "libavutil.so(|.55|.56|.57)".}
 
 proc avutil_version*(): cuint
 ## *
