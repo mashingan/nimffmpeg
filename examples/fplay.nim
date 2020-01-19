@@ -27,6 +27,13 @@ proc audiocallback(data: pointer, stream: ptr byte, length: cint) {.used.} =
   copyMem(stream, userdata[].stream, userdata[].size)
   ]#
 
+proc updateYUVTexture*(
+    texture: TexturePtr; rect: ptr Rect;
+    yPlane: ptr uint8; yPitch: cint;
+    uPlane: ptr uint8; uPitch: cint;
+    vPlane: ptr uint8; vPitch: cint): cint {.
+      cdecl, importc: "SDL_UpdateYUVTexture", dynlib: "SDL2.dll".}
+
 proc render(ctx: ptr AVCodecContext, pkt: ptr AVPacket, frame: ptr AVFrame,
   rect: ptr Rect, texture: TexturePtr, renderer: RendererPtr,
   renderfps: float): uint32
@@ -214,7 +221,7 @@ proc render(ctx: ptr AVCodecContext, pkt: ptr AVPacket, frame: ptr AVFrame,
         $frame[].key_frame,
         $frame[].coded_picture_number,
         $frame[].display_picture_number])
-  texture.updateYUVTexture(rect,
+  discard texture.updateYUVTexture(rect, 
     frame[].data[0], frame[].linesize[0],
     frame[].data[1], frame[].linesize[1],
     frame[].data[2], frame[].linesize[2])
