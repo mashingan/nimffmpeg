@@ -178,7 +178,7 @@ when defined(windows):
 elif defined(macosx):
   {.push importc, dynlib: "swresample(|.2|.3|.4).dylib".}
 else:
-  {.push importc, dynlib: "swresample.so(|.2|.3|.4)".}
+  {.push importc, dynlib: "libswresample.so(|.2|.3|.4)".}
 
 ## *
 ##  Get the AVClass for SwrContext. It can be used in combination with

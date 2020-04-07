@@ -105,8 +105,8 @@ when defined(windows):
   {.push importc, dynlib: "avcodec(|-55|-56|-57|-58|-59).dll".}
 elif defined(macosx):
   {.push importc, dynlib: "avcodec(|.55|.56|.57|.58|.59).dylib".}
-else:avcodec
-  {.push importc, dynlib: "avcodec.so(|.55|.56|.57|.58|.59)".}
+else:
+  {.push importc, dynlib: "libavcodec.so(|.55|.56|.57|.58|.59)".}
 
 ## *
 ##  Parse a Dirac sequence header.

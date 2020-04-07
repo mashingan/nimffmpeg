@@ -32,7 +32,7 @@ import ffmpeg/libavformat/[avformat, avio]
 import ffmpeg/libavutil/[log, avutil, common, dict, frame, hwcontext,
                          opt, pixdesc, pixfmt, rational, samplefmt,
                          channel_layout, avconfig, buffer, adler32,
-                         aes, aes_ctr, imgutils]
+                         aes, aes_ctr, imgutils, error]
 
 import ffmpeg/libpostproc/postprocess
 
@@ -63,7 +63,7 @@ export avformat, avio
 export log, avutil, common, dict, frame, hwcontext,
        opt, pixdesc, pixfmt, rational, samplefmt,
        channel_layout, avconfig, buffer, adler32,
-       aes, aes_ctr, imgutils
+       aes, aes_ctr, imgutils, error
 
 export postprocess
 

@@ -58,7 +58,7 @@ template AV_VERSION_INT*(a, b, c: untyped): untyped =
 ## #define AV_VERSION(a, b, c) AV_VERSION_DOT(a, b, c)
 ## *
 ##  Extract version components from the full ::AV_VERSION_INT int as returned
-##  by functions like ::avformat_version() and ::avcodec_version()
+##  by functions like ::avformat_version() and ::_version()
 ##
 template AV_VERSION_DOT*(a, b, c: untyped): untyped =
   &"{a}.{b}.{c}"

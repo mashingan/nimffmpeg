@@ -36,8 +36,8 @@ when defined(windows):
   {.push importc, dynlib: "swscale(|-4|-5|-6).dll".}
 elif defined(macosx):
   {.push importc, dynlib: "swscale(|.4|.5|.6).dylib".}
-else:swscale
-  {.push importc, dynlib: "swscale.so(|.4|.5|.6)".}
+else:
+  {.push importc, dynlib: "libswscale.so(|.4|.5|.6)".}
 
 {.pragma: swscale, importc, header: "<libswscale/swscale.h>".}
 

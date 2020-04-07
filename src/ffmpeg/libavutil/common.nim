@@ -34,41 +34,56 @@ when defined(windows):
 elif defined(macosx):
   {.push importc, dynlib: "avutil(|.55|.56|.57).dylib".}
 else:
-  {.push importc, dynlib: "avutil.so(|.55|.56|.57)".}
+  {.push importc, dynlib: "libavutil.so(|.55|.56|.57)".}
 
 when cpuEndian == bigEndian:
   template AV_NE*(be, le: untyped): untyped =
-    (be)
+    be
 else:
   template AV_NE*(be, le: untyped): untyped =
-    (le)
+    le
 
 ## rounded division & shift
 
 template RSHIFT*(a, b: untyped): untyped =
-  (if (a) > 0: ((a) + ((1 shl (b)) shr 1)) shr (b) else: ((a) + ((1 shl (b)) shr 1) - 1) shr (b))
+  if (a) > 0:
+    (a + (1 shl (b) shr 1)) shr b
+  else:
+    (a + ((1 shl b) shr 1) - 1) shr b
 
 ##  assume b>0
 
 template ROUNDED_DIV*(a, b: untyped): untyped =
-  ((if (a) >= 0: (a) + ((b) shr 1) else: (a) - ((b) shr 1)) div (b))
+  if a >= 0:
+    a + (b shr 1)
+  else:
+    a - ((b shr 1) div b)
 
 ##  Fast a/(1<<b) rounded toward +inf. Assume a>=0 and b>=0
 
 template AV_CEIL_RSHIFT*(a, b: untyped): untyped =
-  (if not av_builtin_constant_p(b): -((-(a)) shr (b)) else: ((a) + (1 shl (b)) - 1) shr
-      (b))
+  if defined(av_builtin_constant) and not av_builtin_constant_p(b):
+    -((-a) shr b)
+  else:
+    (a + (1 shl b) - 1) shr b
 
 ##  Backwards compat.
 
+<<<<<<< HEAD
 template FF_CEIL_RSHIFT*(a, b: untyped): untyped =
   AV_CEIL_RSHIFT(a, b)
+=======
+#const FF_CEIL_RSHIFT* = AV_CEIL_RSHIFT
+>>>>>>> c1641eaf1ba2844eb4f1d3a27d46d4fde5c9fc70
 
 template FFUDIV*(a, b: untyped): untyped =
-  ((if (a) > 0: (a) else: (a) - (b) + 1) div (b))
+  if a > 0:
+    a
+  else:
+    a - ((b + 1) div b)
 
 template FFUMOD*(a, b: untyped): untyped =
-  ((a) - (b) * FFUDIV(a, b))
+  a - (b * FFUDIV(a, b))
 
 ## *
 ##  Absolute value, Note, INT_MIN / INT64_MIN result in undefined behavior as they
@@ -78,10 +93,12 @@ template FFUMOD*(a, b: untyped): untyped =
 ##
 
 template FFABS*(a: untyped): untyped =
-  (if (a) >= 0: (a) else: (-(a)))
+  if a >= 0: a
+  else: -a
 
 template FFSIGN*(a: untyped): untyped =
-  (if (a) > 0: 1 else: -1)
+  if a > 0: 1
+  else: -1
 
 ## *
 ##  Negative Absolute value.
@@ -91,7 +108,8 @@ template FFSIGN*(a: untyped): untyped =
 ##
 
 template FFNABS*(a: untyped): untyped =
-  (if (a) <= 0: (a) else: (-(a)))
+  if a <= 0: a
+  else: -a
 
 ## *
 ##  Comparator.
@@ -104,30 +122,32 @@ template FFNABS*(a: untyped): untyped =
 ##
 
 template FFDIFFSIGN*(x, y: untyped): untyped =
-  (((x) > (y)) - ((x) < (y)))
+  if x > y: 1
+  elif x < y: -1
+  else: 0
 
 template FFMAX*(a, b: untyped): untyped =
-  (if (a) > (b): (a) else: (b))
+  if a > b: a
+  else: b
 
 template FFMAX3*(a, b, c: untyped): untyped =
   FFMAX(FFMAX(a, b), c)
 
 template FFMIN*(a, b: untyped): untyped =
-  (if (a) > (b): (b) else: (a))
+  if a > b: b
+  else: a
 
 template FFMIN3*(a, b, c: untyped): untyped =
   FFMIN(FFMIN(a, b), c)
 
-template FFSWAP*(`type`, a, b: untyped): void =
-  while true:
-    var SWAPmp: `type` = b
-    b = a
-    a = SWAPmp
-    if not 0:
-      break
+template FFSWAP*(_: typedesc, a, b: untyped) =
+  swap a, b
 
-template FF_ARRAY_ELEMS*(a: untyped): untyped =
-  (sizeof((a) div sizeof(((a)[0]))))
+template FE_ARRAY_ELEMS*[T](a: ptr T): csize =
+  (sizeof a) div (sizeof T)
+
+template FE_ARRAY_ELEMS*[T](a: openArray[T]): csize =
+  a.len
 
 ##  misc math functions
 

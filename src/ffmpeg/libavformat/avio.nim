@@ -32,10 +32,10 @@ import
 
 when defined(windows):
   {.push importc, dynlib: "avformat-(|55|56|57|58).dll".}
-elif defined(macosx):format
+elif defined(macosx):
   {.push importc, dynlib: "avformat(|.55|.56|.57|.58).dylib".}
-else:format
-  {.push importc, dynlib: "avformat.so(|.55|.56|.57|.58)".}
+else:
+  {.push importc, dynlib: "libavformat.so(|.55|.56|.57|.58)".}
 
 
 ## *

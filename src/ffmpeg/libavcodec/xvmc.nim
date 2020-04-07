@@ -36,10 +36,14 @@
 const
   AV_XVMC_ID* = 0x1DC711C0
 
+{.pragma: xvmc, importc, header: "<X11/extensions/XvMC.h>".}
+
 ## struct attribute_deprecated xvmc_pix_fmt {
 
 type
-  xvmc_pix_fmt* {.bycopy.} = object
+  XvMCMacroBlock* {.xvmc.} = object
+  XvMCSurface* {.xvmc.} = object
+  xvmc_pix_fmt* {.importc, header: "<libavcodec/xvmc.h>", deprecated.} = object
     xvmc_id*: cint ## * The field contains the special constant value AV_XVMC_ID.
                  ##         It is used as a test that the application correctly uses the API,
                  ##         and that there is no corruption caused by pixel routines.
