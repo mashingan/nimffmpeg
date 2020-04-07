@@ -69,12 +69,8 @@ template AV_CEIL_RSHIFT*(a, b: untyped): untyped =
 
 ##  Backwards compat.
 
-<<<<<<< HEAD
 template FF_CEIL_RSHIFT*(a, b: untyped): untyped =
   AV_CEIL_RSHIFT(a, b)
-=======
-#const FF_CEIL_RSHIFT* = AV_CEIL_RSHIFT
->>>>>>> c1641eaf1ba2844eb4f1d3a27d46d4fde5c9fc70
 
 template FFUDIV*(a, b: untyped): untyped =
   if a > 0:
