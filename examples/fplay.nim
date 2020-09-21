@@ -30,7 +30,7 @@ proc audiocallback(data: pointer, stream: ptr byte, length: cint) {.used.} =
 when defined(windows):
   const sdl2Lib = "SDL2.dll"
 else:
-  const sdl2Lib = "sdl2.so"
+  const sdl2Lib = "libSDL2.so"
 
 proc updateYUVTexture*(
     texture: TexturePtr; rect: ptr Rect;
