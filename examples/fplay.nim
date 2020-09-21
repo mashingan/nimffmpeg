@@ -27,12 +27,17 @@ proc audiocallback(data: pointer, stream: ptr byte, length: cint) {.used.} =
   copyMem(stream, userdata[].stream, userdata[].size)
   ]#
 
+when defined(windows):
+  const sdl2Lib = "SDL2.dll"
+else:
+  const sdl2Lib = "sdl2.so"
+
 proc updateYUVTexture*(
     texture: TexturePtr; rect: ptr Rect;
     yPlane: ptr uint8; yPitch: cint;
     uPlane: ptr uint8; uPitch: cint;
     vPlane: ptr uint8; vPitch: cint): cint {.
-      cdecl, importc: "SDL_UpdateYUVTexture", dynlib: "SDL2.dll".}
+      cdecl, importc: "SDL_UpdateYUVTexture", dynlib: sdl2Lib.}
 
 proc render(ctx: ptr AVCodecContext, pkt: ptr AVPacket, frame: ptr AVFrame,
   rect: ptr Rect, texture: TexturePtr, renderer: RendererPtr,
