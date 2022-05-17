@@ -52,7 +52,7 @@ proc paramAndCodec(ctx: ptr AVFormatContext, vidcodec, audcodec: var CodecInfo):
     streams = cast[ptr UncheckedArray[ptr AVStream]](ctx[].streams)
     foundVideo = false
     foundAudio = false
-  for i in 0 .. ctx[].nb_streams:
+  for i in 0 ..< ctx[].nb_streams:
     let localparam = streams[i][].codecpar
     if localparam[].codec_type == AVMEDIA_TYPE_VIDEO:
       let rational = streams[i].avg_frame_rate
